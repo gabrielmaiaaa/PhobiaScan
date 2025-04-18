@@ -3,22 +3,10 @@ import cv2
 import numpy as np
 from keras.models import load_model
 
-current_dir = os.path.dirname(__file__)
-model_path = os.path.abspath(os.path.join(current_dir, '..', '..', 'notebook', 'modelo_emocoes.keras'))
-
-model = load_model(model_path)
-emotion_labels = ['angry', 'disgust', 'fear', 'happy', 'neutral', 'sad', 'surprise']
-
-faceCascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-video_capture = cv2.VideoCapture(0)
-img_id = 0
-
-name = input('Seu nome: ')
-
-def save_dataset(img, name, id, img_id):
+def save_dataset(img, name, img_id):
     base_dir = os.path.dirname(__file__) 
     save_path = os.path.join(base_dir, '..', '..', 'data', name) 
-    filename = f"{name}.{id}.{img_id}.jpg"
+    filename = f"{name}.{img_id}.jpg"
     full_path = os.path.join(save_path, filename)
 
     if not os.path.exists(save_path):
@@ -38,7 +26,7 @@ def draw_face_box(img, classifier, scaleFactor, minNeighbors, color, text):
 
     return coords, img
 
-def detect(img, faceCascade, name, img_id):
+def detect(img, faceCascade, name, img_id, model, emotion_labels):
     color = {'blue': (255,0,0), 'green': (0,255,0), 'red': (0,0,255)}
     coords, img = draw_face_box(img, faceCascade, 1.1, 10, color['blue'], "Voce")
 
@@ -60,19 +48,35 @@ def detect(img, faceCascade, name, img_id):
         cv2.putText(img, f"Confianca: {confidence:.1f}%", (coords[0], coords[1]-10), 
                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, color['green'], 2)
         
-        save_dataset(roi_img, name, 1, img_id)
-        save_dataset(roi_gray, name+'_Gray', 1, img_id)
+        save_dataset(roi_img, name, img_id)
+        save_dataset(roi_gray, name+'_Gray', img_id)
 
     return img
 
-while True:
-    _, img = video_capture.read()
-    img = detect(img, faceCascade, name, img_id)
-    cv2.imshow("Te vejo", img)
-    img_id += 1
+def main():
+    current_dir = os.path.dirname(__file__)
+    model_path = os.path.abspath(os.path.join(current_dir, '..', '..', 'models', 'modelo_emocoes.keras'))
 
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+    model = load_model(model_path)
+    emotion_labels = ['angry', 'disgust', 'fear', 'happy', 'neutral', 'sad', 'surprise']
 
-video_capture.release()
-cv2.destroyAllWindows()
+    faceCascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+    video_capture = cv2.VideoCapture(0)
+    img_id = 0
+
+    name = input('Seu nome: ')
+
+    while True:
+        _, img = video_capture.read()
+        img = detect(img, faceCascade, name, img_id, model, emotion_labels)
+        cv2.imshow("Te vejo", img)
+        img_id += 1
+
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    video_capture.release()
+    cv2.destroyAllWindows()
+
+if __name__ == '__main__':
+    main()
