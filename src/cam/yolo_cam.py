@@ -36,7 +36,7 @@ def save_dataset(img, img_gray, name, name_gray, img_id):
     # Cria os diretórios se não existirem
     for path in paths.values():
         os.makedirs(path, exist_ok=True)
-        print(f"Pasta '{path}' verificada/criada com sucesso!")
+        print(f"Pasta '{path}' criada com sucesso!")
     
     # Gera os nomes dos arquivos
     filenames = {
