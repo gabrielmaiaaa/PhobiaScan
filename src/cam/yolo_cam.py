@@ -6,14 +6,14 @@ from ultralytics import YOLO
 
 # Função que carrega os modelos que treinamos e o Yolo
 def get_models():
-    emotion_labels = ['angry', 'disgust', 'fear', 'happy', 'neutral', 'sad', 'surprise']
+    emotion_labels = ['angry', 'disgust', 'fear', 'neutral', 'surprise']
 
     current_dir = os.path.dirname(__file__)
 
     # Caminhos dos modelos
     model_paths = {
         'yolo': os.path.abspath(os.path.join(current_dir, '..', '..', 'models', 'yolov8n-face.pt')),
-        'mini_xception': os.path.abspath(os.path.join(current_dir, '..', '..', 'models', 'modelo_emocoes.keras'))
+        'mini_xception': os.path.abspath(os.path.join(current_dir, '..', '..', 'notebook', 'modelo_emocoes.keras'))
     }
 
     # Carregando modelos
@@ -36,7 +36,7 @@ def save_dataset(img, img_gray, name, name_gray, img_id):
     # Cria os diretórios se não existirem
     for path in paths.values():
         os.makedirs(path, exist_ok=True)
-        print(f"Pasta '{path}' criada com sucesso!")
+        # print(f"Pasta '{path}' criada com sucesso!")
     
     # Gera os nomes dos arquivos
     filenames = {
@@ -80,8 +80,11 @@ def detect(img, name, img_id, models):
             
             # Modelo nosso devolvendo nossa probabilidade e qual emoção é
             probabilities = model_mini_xception.predict(roi_reshaped, verbose=0)
+            print(probabilities)
             predicted_class = np.argmax(probabilities)
+            print(predicted_class)
             emotion = emotion_labels[predicted_class]
+            print(emotion)
             confidence = np.max(probabilities) * 100
             
             # Printando na câmera a emoção e a probabilidade
