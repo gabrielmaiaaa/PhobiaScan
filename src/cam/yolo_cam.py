@@ -13,7 +13,8 @@ def get_models():
     # Caminhos dos modelos
     model_paths = {
         'yolo': os.path.abspath(os.path.join(current_dir, '..', '..', 'models', 'yolov8n-face.pt')),
-        'mini_xception': os.path.abspath(os.path.join(current_dir, '..', '..', 'notebook', 'modelo_emocoes.keras'))
+        'mini_xception': os.path.abspath(os.path.join(current_dir, '..', '..', 'modelo_emocoes.keras'))
+        # 'mini_xception': os.path.abspath(os.path.join(current_dir, '..', '..', 'modelo_emocoes.keras'))
     }
 
     # Carregando modelos
