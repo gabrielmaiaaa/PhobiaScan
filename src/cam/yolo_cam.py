@@ -6,7 +6,7 @@ from ultralytics import YOLO
 
 # Função que carrega os modelos que treinamos e o Yolo
 def get_models():
-    emotion_labels = ['angry', 'disgust', 'fear', 'happy', 'neutral', 'sad', 'surprise']
+    emotion_labels = ['disgust', 'fear', 'neutral', 'surprise']
 
     current_dir = os.path.dirname(__file__)
 

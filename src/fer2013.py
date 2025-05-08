@@ -26,7 +26,7 @@ datagen_train = ImageDataGenerator(
     horizontal_flip=True,
     brightness_range=[0.8, 1.2],  
     rescale=1./255,
-    validation_split=0.2  # Split interno para validação
+    validation_split=0.2  
 )
 datagen_test = ImageDataGenerator(
     rescale=1./255
@@ -116,7 +116,7 @@ early_stop = EarlyStopping(
 
 # Nome do melhor modelo com timestamp
 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-checkpoint_filename = f"models/fer2013_{timestamp}.keras"
+checkpoint_filename = f"models/chechpoint_fer2013_{timestamp}.keras"
 
 checkpoint = ModelCheckpoint(
     checkpoint_filename,

@@ -113,7 +113,7 @@ early_stop = EarlyStopping(
 
 # Nome do melhor modelo com timestamp
 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-checkpoint_filename = f"models/fer2013plus_{timestamp}.keras"
+checkpoint_filename = f"models/checkpoint_fer2013plus_{timestamp}.keras"
 
 checkpoint = ModelCheckpoint(
     checkpoint_filename,
