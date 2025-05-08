@@ -1,11 +1,11 @@
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
-dir_train = "../PhobiaScan/data/Fer2013Dataset/train"
-dir_test = "../PhobiaScan/data/Fer2013Dataset/test"
+dir_train = "../PhobiaScan/data/Fer2013/train"
+dir_test = "../PhobiaScan/data/Fer2013/test"
 
-# # dir_train = "../data/images2/FER2013Train"
-# # dir_test = "../data/images2/FER2013Test"
-# # dir_valid = "../data/images2/FER2013Valid"
+# # dir_train = "../data/Fer2013Plus/FER2013Train"
+# # dir_test = "../data/Fer2013Plus/FER2013Test"
+# # dir_valid = "../data/Fer2013Plus/FER2013Valid"
 
 datagen_train = ImageDataGenerator(
     width_shift_range=0.1,
@@ -24,20 +24,20 @@ datagen_valid = ImageDataGenerator(
 )
 
 train_generator = datagen_train.flow_from_directory(
-    directory = dir_train,         
-    target_size = (48, 48),         
-    batch_size = 32,                
-    color_mode = "grayscale",        
-    class_mode = "categorical",     
-    subset = "training" 
+    directory=dir_train,
+    target_size=(48, 48),
+    batch_size=32,
+    color_mode="grayscale",
+    class_mode="categorical",
+    subset="training"
 )
-
-validation_generator = datagen_valid.flow_from_directory(
-    directory = dir_test,       
-    target_size = (48, 48),     
-    batch_size = 32,            
-    color_mode = "grayscale",   
-    class_mode = "categorical",   
+validation_generator = datagen_train.flow_from_directory(
+    directory=dir_train,
+    target_size=(48, 48),
+    batch_size=32,
+    color_mode="grayscale",
+    class_mode="categorical",
+    subset="validation"
 )
 
 import matplotlib.pyplot as plt
@@ -48,7 +48,7 @@ for images, _ in train_generator:
     break
 
 input_shape = (48, 48, 1)
-num_classes = 3
+num_classes = len(train_generator.class_indices)
 l2_regularization = 0.01
 patience = 100
 verbose = 1
@@ -146,7 +146,7 @@ class_weight_dict = dict(enumerate(class_weights))
 hist = model.fit(
     train_generator,
     steps_per_epoch=len(train_generator),
-    epochs=1000,
+    epochs=10,
     verbose=verbose,
     validation_data=validation_generator,
     validation_steps=len(validation_generator),
@@ -156,6 +156,7 @@ hist = model.fit(
 
 
 import matplotlib.pyplot as plt
+from datetime import datetime
 
 plt.plot(hist.history['loss'])
 plt.plot(hist.history['val_loss'])
@@ -173,10 +174,18 @@ plt.xlabel('Epoch')
 plt.legend(['Train', 'Val'], loc='lower right')
 plt.show()
 
-model.save("modelo_emocoes.keras")
+# Crie o timestamp
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+# Monte o nome do arquivo com o timestamp
+model_filename = f"modelo_emocoes_{timestamp}.keras"
+
+# Salve o modelo
+model.save(model_filename)
+
 
 from keras.models import load_model
-model = load_model("modelo_emocoes.keras")
+model = load_model(model_filename)
 
 import matplotlib.pyplot as plt
 # my_image = plt.imread("../data/FER2013Cleaned/test/fear/fer0000450.png")
@@ -200,13 +209,11 @@ probabilities = model.predict(my_image_gray)
 plt.imshow(np.squeeze(my_image_gray))
 plt.show()
 
-number_to_class = ['fear', 'neutral', 'surprise']
-index = np.argsort(probabilities[0,:])
-# print("Most likely class:", number_to_class[index[4]], "-- Probability:", probabilities[0,index[4]])
-# print("Second most likely class:", number_to_class[index[3]], "-- Probability:", probabilities[0,index[3]])
-print("Third most likely class:", number_to_class[index[2]], "-- Probability:", probabilities[0,index[2]])
-print("Fourth most likely class:", number_to_class[index[1]], "-- Probability:", probabilities[0,index[1]])
-print("Fifth most likely class:", number_to_class[index[0]], "-- Probability:", probabilities[0,index[0]])
+number_to_class = list(train_generator.class_indices.keys())
+
+index = np.argsort(probabilities[0, :])[::-1]
+for i in range(min(5, len(number_to_class))):
+    print(f"{i+1}ª classe mais provável: {number_to_class[index[i]]} -- Probabilidade: {probabilities[0, index[i]]:.3f}")
 
 from sklearn.metrics import classification_report, confusion_matrix
 import numpy as np
