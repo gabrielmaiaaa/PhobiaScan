@@ -29,7 +29,8 @@ train_generator = datagen_train.flow_from_directory(
     batch_size=32,
     color_mode="grayscale",
     class_mode="categorical",
-    subset="training"
+    subset="training",
+    shuffle=True
 )
 validation_generator = datagen_train.flow_from_directory(
     directory=dir_train,
@@ -37,13 +38,16 @@ validation_generator = datagen_train.flow_from_directory(
     batch_size=32,
     color_mode="grayscale",
     class_mode="categorical",
-    subset="validation"
+    subset="validation",
+    shuffle=False
 )
 
 import matplotlib.pyplot as plt
+import numpy as np
 
-for images, _ in train_generator:
-    plt.imshow(images[0])
+for images, labels in train_generator:
+    plt.imshow(images[0].squeeze(), cmap='gray')
+    plt.title(f"Classe: {np.argmax(labels[0])}")
     plt.show()
     break
 
@@ -111,7 +115,7 @@ model.compile(loss='categorical_crossentropy',
 
 from keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 from sklearn.utils.class_weight import compute_class_weight
-import numpy as np
+from datetime import datetime
 
 early_stop = EarlyStopping(
     monitor='val_loss',
@@ -119,8 +123,11 @@ early_stop = EarlyStopping(
     restore_best_weights=True
 )
 
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+checkpoint_filename = f"models/melhor_modelo_{timestamp}.keras"
+
 checkpoint = ModelCheckpoint(
-    "melhor_modelo.keras",
+    checkpoint_filename,
     monitor='val_accuracy',
     save_best_only=True,
     verbose=verbose
@@ -134,7 +141,7 @@ reduce_lr = ReduceLROnPlateau(
     verbose=1
 )
 
-y_train = np.array(train_generator.classes)
+y_train = train_generator.classes
 class_weights = compute_class_weight(
     class_weight='balanced',
     classes=np.unique(y_train),
@@ -156,7 +163,6 @@ hist = model.fit(
 
 
 import matplotlib.pyplot as plt
-from datetime import datetime
 
 plt.plot(hist.history['loss'])
 plt.plot(hist.history['val_loss'])
@@ -174,39 +180,36 @@ plt.xlabel('Epoch')
 plt.legend(['Train', 'Val'], loc='lower right')
 plt.show()
 
-# Crie o timestamp
-timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-
-# Monte o nome do arquivo com o timestamp
-model_filename = f"modelo_emocoes_{timestamp}.keras"
-
 # Salve o modelo
-model.save(model_filename)
+final_model_filename = f"models/modelo_emocoes_{timestamp}.keras"
+model.save(final_model_filename)
+print(f"Modelo salvo como {final_model_filename}")
 
 
 from keras.models import load_model
-model = load_model(model_filename)
+model = load_model(checkpoint_filename)
 
 import matplotlib.pyplot as plt
-# my_image = plt.imread("../data/FER2013Cleaned/test/fear/fer0000450.png")
-my_image = plt.imread("../PhobiaScan/data/gab/Color/gab.153.jpg")
-plt.imshow(my_image)
+from skimage.io import imread
+
+my_image_path = "../PhobiaScan/data/gab/Color/gab.153.jpg"
+my_image = imread(my_image_path)
 
 from skimage.transform import resize
-my_image_resized = resize(my_image, (48,48,3))
-
-img = plt.imshow(my_image_resized)
+if my_image.ndim == 3:
+    my_image_gray = rgb2gray(resize(my_image, (48, 48)))
+else:
+    my_image_gray = resize(my_image, (48, 48))
 
 import numpy as np
 from skimage.color import rgb2gray
 
-my_image_gray = rgb2gray(my_image_resized) 
-my_image_gray = np.expand_dims(my_image_gray, axis=-1)  
-my_image_gray = np.expand_dims(my_image_gray, axis=0)
+my_image_gray = np.expand_dims(my_image_gray, axis=-1)  # (48,48,1)
+my_image_gray = np.expand_dims(my_image_gray, axis=0)   # (1,48,48,1)
+my_image_gray = my_image_gray.astype('float32') / 255.0
 
 probabilities = model.predict(my_image_gray)
-
-plt.imshow(np.squeeze(my_image_gray))
+plt.imshow(my_image_gray.squeeze(), cmap='gray')
 plt.show()
 
 number_to_class = list(train_generator.class_indices.keys())
@@ -220,10 +223,9 @@ import numpy as np
 # Gere predições no conjunto de validação
 y_pred = model.predict(validation_generator)
 y_pred = np.argmax(y_pred, axis=1)
+y_true = validation_generator.classes
 
-# Matriz de confusão
-print(confusion_matrix(validation_generator.classes, y_pred))
-
-# Relatório por classe
-print(classification_report(validation_generator.classes, y_pred,
-                           target_names=number_to_class))
+print("Matriz de confusão:")
+print(confusion_matrix(y_true, y_pred))
+print("Relatório de classificação:")
+print(classification_report(y_true, y_pred, target_names=number_to_class))

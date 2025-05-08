@@ -135,7 +135,7 @@ class_weight_dict = dict(enumerate(class_weights))
 hist = model.fit(
     train_generator,
     steps_per_epoch=len(train_generator),
-    epochs=50,
+    epochs=10,
     verbose=verbose,
     validation_data=validation_generator,
     validation_steps=len(validation_generator),
