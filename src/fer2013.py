@@ -17,10 +17,6 @@ import os
 dir_train = "../PhobiaScan/data/Fer2013/train"
 dir_test = "../PhobiaScan/data/Fer2013/test"
 
-dir_train_plus = "../PhobiaScan/data/Fer2013Plus/FER2013Train"
-dir_valid_plus = "../PhobiaScan/data/Fer2013Plus/FER2013Valid"
-dir_test_plus = "../PhobiaScan/data/Fer2013Plus/FER2013Test"
-
 # Data augmentation para treino e validação
 datagen_train = ImageDataGenerator(
     width_shift_range=0.1,
@@ -120,7 +116,7 @@ early_stop = EarlyStopping(
 
 # Nome do melhor modelo com timestamp
 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-checkpoint_filename = f"melhor_modelo_{timestamp}.keras"
+checkpoint_filename = f"models/fer2013_{timestamp}.keras"
 
 checkpoint = ModelCheckpoint(
     checkpoint_filename,
@@ -177,7 +173,7 @@ plt.legend(['Train', 'Val'], loc='lower right')
 plt.show()
 
 # Salvar modelo final com timestamp
-final_model_filename = f"modelo_emocoes_{timestamp}.keras"
+final_model_filename = f"models/fer2013_{timestamp}.keras"
 model.save(final_model_filename)
 print(f"Modelo salvo como {final_model_filename}")
 
