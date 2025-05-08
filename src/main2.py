@@ -17,19 +17,26 @@ import os
 dir_train = "../PhobiaScan/data/Fer2013/train"
 dir_test = "../PhobiaScan/data/Fer2013/test"
 
+dir_train_plus = "../PhobiaScan/data/Fer2013Plus/FER2013Train"
+dir_valid_plus = "../PhobiaScan/data/Fer2013Plus/FER2013Valid"
+dir_test_plus = "../PhobiaScan/data/Fer2013Plus/FER2013Test"
+
 # Data augmentation para treino e validação
 datagen_train = ImageDataGenerator(
     width_shift_range=0.1,
     height_shift_range=0.1,
-    rotation_range=15,
-    zoom_range=0.15,
+    rotation_range=15,  
+    zoom_range=0.15,   
     horizontal_flip=True,
-    brightness_range=[0.8, 1.2],
+    brightness_range=[0.8, 1.2],  
     rescale=1./255,
-    validation_split=0.2  # Usaremos o subset para validação
+    validation_split=0.2  # Split interno para validação
+)
+datagen_test = ImageDataGenerator(
+    rescale=1./255
 )
 
-# Geradores
+# Gerador de treino (80% do dir_train)
 train_generator = datagen_train.flow_from_directory(
     directory=dir_train,
     target_size=(48, 48),
@@ -39,6 +46,7 @@ train_generator = datagen_train.flow_from_directory(
     subset="training",
     shuffle=True
 )
+# Gerador de validação (20% do dir_train)
 validation_generator = datagen_train.flow_from_directory(
     directory=dir_train,
     target_size=(48, 48),
@@ -46,6 +54,14 @@ validation_generator = datagen_train.flow_from_directory(
     color_mode="grayscale",
     class_mode="categorical",
     subset="validation",
+    shuffle=False
+)
+test_generator = datagen_test.flow_from_directory(
+    directory=dir_test,
+    target_size=(48, 48),
+    batch_size=32,
+    color_mode="grayscale",
+    class_mode="categorical",
     shuffle=False
 )
 
@@ -135,7 +151,7 @@ class_weight_dict = dict(enumerate(class_weights))
 hist = model.fit(
     train_generator,
     steps_per_epoch=len(train_generator),
-    epochs=10,
+    epochs=1000,
     verbose=verbose,
     validation_data=validation_generator,
     validation_steps=len(validation_generator),
@@ -196,12 +212,14 @@ index = np.argsort(probabilities[0, :])[::-1]
 for i in range(min(5, len(number_to_class))):
     print(f"{i+1}ª classe mais provável: {number_to_class[index[i]]} -- Probabilidade: {probabilities[0, index[i]]:.3f}")
 
-# Avaliação no conjunto de validação
-y_pred = model.predict(validation_generator)
-y_pred = np.argmax(y_pred, axis=1)
-y_true = validation_generator.classes
+# Avaliação no conjunto de teste
+y_test_pred = model.predict(test_generator)
+y_test_pred = np.argmax(y_test_pred, axis=1)
+y_test_true = test_generator.classes
 
-print("Matriz de confusão:")
-print(confusion_matrix(y_true, y_pred))
-print("Relatório de classificação:")
-print(classification_report(y_true, y_pred, target_names=number_to_class))
+number_to_class = list(test_generator.class_indices.keys())
+
+print("Matriz de confusão (Teste):")
+print(confusion_matrix(y_test_true, y_test_pred))
+print("Relatório de classificação (Teste):")
+print(classification_report(y_test_true, y_test_pred, target_names=number_to_class))
