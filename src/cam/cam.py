@@ -12,14 +12,17 @@ def get_models():
 
     # Caminhos dos modelos
     model_paths = {
-        'yolo': os.path.abspath(os.path.join(current_dir, '..', '..', 'models', 'yolov8n-face.pt')),
-        'mini_xception': os.path.abspath(os.path.join(current_dir, '..', '..', 'models', 'modelo_emocoes_20250508_020956.keras'))
+        'yolo': os.path.abspath(os.path.join(current_dir, '..', '..', 'models', 'cam', 'yolov8n-face.pt')),
+        'mini_xception': os.path.abspath(os.path.join(current_dir, '..', '..', 'models', 'mini_Xception',
+                                                       'fer2013_mini_XCEPTION.119-0.65.hdf5')),
+        'mini_xceptionFine': os.path.abspath(os.path.join(current_dir, '..', '..', 
+                                                          'mini_xception_finetuned.h5'))
         # 'mini_xception': os.path.abspath(os.path.join(current_dir, '..', '..', 'modelo_emocoes.keras'))
     }
 
     # Carregando modelos
     model_face = YOLO(model_paths['yolo'])
-    model_mini_xception = load_model(model_paths['mini_xception'])
+    model_mini_xception = load_model(model_paths['mini_xceptionFine'], compile=False)
 
     return model_face, model_mini_xception, emotion_labels
 
@@ -107,11 +110,12 @@ def main():
 
     video_capture = cv2.VideoCapture(0)
 
-    name = input(   '--------------------------------------' \
-                    '--------------------------------------' \
-                    '--------------------------------------\n' \
-                    'Digite seu nome: '                             )
+    # name = input(   '--------------------------------------' \
+    #                 '--------------------------------------' \
+    #                 '--------------------------------------\n' \
+    #                 'Digite seu nome: '                             )
 
+    name = 'gab'
     while True:
         _, img = video_capture.read()
         img = detect(img, name, img_id, models)

@@ -1,17 +1,22 @@
+import tensorflow as tf
+print(tf.config.list_physical_devices('GPU'))
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import matplotlib.pyplot as plt
 from datetime import datetime
 import numpy as np
-from keras.layers import Conv2D, MaxPooling2D, BatchNormalization, Activation, SeparableConv2D, Input, GlobalAveragePooling2D, Dropout
-from keras.models import Model, load_model
-from keras.regularizers import l2
-from keras import layers
+from keras.models import load_model
 from keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 from sklearn.utils.class_weight import compute_class_weight
 from sklearn.metrics import classification_report, confusion_matrix
 from skimage.transform import resize
 from skimage.color import rgb2gray
-import os
+
+# docker run --gpus all -it -v "C:\Users\gmara\Documents\Sourcetree\PhobiaScan:/tf/PhobiaScan" -w /tf/PhobiaScan tf-gpu-custom python -m src.fer2013
+
+
+# docker run --gpus all -it -v "C:\Users\gmara\.nv:/root/.nv" -v "C:\Users\gmara\Documents\Sourcetree\PhobiaScan:/tf/PhobiaScan" -w /tf/PhobiaScan tf-gpu-custom python -m src.fer2013
+
+from models.cnn import fine_tuning_Mini_Xception, mini_Xception
 
 # Diretórios
 dir_train = "../PhobiaScan/data/Fer2013/train"
@@ -61,6 +66,8 @@ test_generator = datagen_test.flow_from_directory(
     shuffle=False
 )
 
+# fine_tuning_Mini_Xception(train_generator, validation_generator)
+
 # Visualização de um batch
 for images, labels in train_generator:
     plt.imshow(images[0].squeeze(), cmap='gray')
@@ -72,68 +79,37 @@ for images, labels in train_generator:
 input_shape = (48, 48, 1)
 num_classes = len(train_generator.class_indices)
 l2_regularization = 0.01
-patience = 100  
+patience = 50  
 verbose = 1
 
-# Arquitetura do modelo
-regularization = l2(l2_regularization)
-img_input = Input(input_shape)
-x = Conv2D(8, (3, 3), strides=(1, 1), kernel_regularizer=regularization, use_bias=False)(img_input)
-x = BatchNormalization()(x)
-x = Activation('relu')(x)
-x = Conv2D(8, (3, 3), strides=(1, 1), kernel_regularizer=regularization, use_bias=False)(x)
-x = BatchNormalization()(x)
-x = Activation('relu')(x)
-x = Dropout(0.25)(x)
-
-filter_list = [16, 32, 64, 128]
-for n in filter_list:
-    residual = Conv2D(n, (1, 1), strides=(2, 2), padding='same', use_bias=False)(x)
-    residual = BatchNormalization()(residual)
-    x = SeparableConv2D(n, (3, 3), padding='same', depthwise_regularizer=regularization, pointwise_regularizer=regularization, use_bias=False)(x)
-    x = BatchNormalization()(x)
-    x = Activation('relu')(x)
-    x = Dropout(0.25)(x)
-    x = SeparableConv2D(n, (3, 3), padding='same', depthwise_regularizer=regularization, pointwise_regularizer=regularization, use_bias=False)(x)
-    x = BatchNormalization()(x)
-    x = MaxPooling2D((3, 3), strides=(2, 2), padding='same')(x)
-    x = layers.add([x, residual])
-
-x = Conv2D(num_classes, (3, 3), padding='same')(x)
-x = GlobalAveragePooling2D()(x)
-output = Activation('softmax', name='predictions')(x)
-model = Model(img_input, output)
-model.summary()
+model = mini_Xception(num_classes, input_shape)
 
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
-# Callbacks
 early_stop = EarlyStopping(
     monitor='val_loss',
     patience=patience,
     restore_best_weights=True
 )
 
-# Nome do melhor modelo com timestamp
 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 checkpoint_filename = f"models/chechpoint_fer2013_{timestamp}.keras"
 
 checkpoint = ModelCheckpoint(
     checkpoint_filename,
-    monitor='val_accuracy',
+    monitor='val_loss',
     save_best_only=True,
     verbose=verbose
 )
 
 reduce_lr = ReduceLROnPlateau(
     monitor='val_loss',
-    factor=0.2,
-    patience=5,
+    factor=0.1,
+    patience=(patience/4),
     min_lr=0.00001,
-    verbose=1
+    verbose=verbose
 )
 
-# Class weights automáticos
 y_train = train_generator.classes
 class_weights = compute_class_weight(
     class_weight='balanced',
@@ -143,11 +119,10 @@ class_weights = compute_class_weight(
 
 class_weight_dict = dict(enumerate(class_weights))
 
-# Treinamento
 hist = model.fit(
     train_generator,
     steps_per_epoch=len(train_generator),
-    epochs=1000,
+    epochs=50,
     verbose=verbose,
     validation_data=validation_generator,
     validation_steps=len(validation_generator),
@@ -155,7 +130,6 @@ hist = model.fit(
     callbacks=[early_stop, checkpoint, reduce_lr]
 )
 
-# Plot das curvas de loss e accuracy
 plt.plot(hist.history['loss'])
 plt.plot(hist.history['val_loss'])
 plt.title('Model loss')
@@ -172,43 +146,36 @@ plt.xlabel('Epoch')
 plt.legend(['Train', 'Val'], loc='lower right')
 plt.show()
 
-# Salvar modelo final com timestamp
 final_model_filename = f"models/fer2013_{timestamp}.keras"
 model.save(final_model_filename)
 print(f"Modelo salvo como {final_model_filename}")
 
-# Carregar melhor modelo salvo
 model = load_model(checkpoint_filename)
 
-# Inferência em uma imagem de teste
 from skimage.io import imread
 
-# Troque pelo caminho de uma imagem real do seu dataset
 my_image_path = "../PhobiaScan/data/gab/Color/gab.153.jpg"
 my_image = imread(my_image_path)
 
-# Se a imagem for colorida, converte para cinza
 if my_image.ndim == 3:
     my_image_gray = rgb2gray(resize(my_image, (48, 48)))
 else:
     my_image_gray = resize(my_image, (48, 48))
 
-my_image_gray = np.expand_dims(my_image_gray, axis=-1)  # (48,48,1)
-my_image_gray = np.expand_dims(my_image_gray, axis=0)   # (1,48,48,1)
+my_image_gray = np.expand_dims(my_image_gray, axis=-1) 
+my_image_gray = np.expand_dims(my_image_gray, axis=0)  
 my_image_gray = my_image_gray.astype('float32') / 255.0
 
 probabilities = model.predict(my_image_gray)
 plt.imshow(my_image_gray.squeeze(), cmap='gray')
 plt.show()
 
-# Classes dinâmicas
 number_to_class = list(train_generator.class_indices.keys())
-# Ordena por probabilidade
+
 index = np.argsort(probabilities[0, :])[::-1]
 for i in range(min(5, len(number_to_class))):
     print(f"{i+1}ª classe mais provável: {number_to_class[index[i]]} -- Probabilidade: {probabilities[0, index[i]]:.3f}")
 
-# Avaliação no conjunto de teste
 y_test_pred = model.predict(test_generator)
 y_test_pred = np.argmax(y_test_pred, axis=1)
 y_test_true = test_generator.classes
@@ -219,3 +186,22 @@ print("Matriz de confusão (Teste):")
 print(confusion_matrix(y_test_true, y_test_pred))
 print("Relatório de classificação (Teste):")
 print(classification_report(y_test_true, y_test_pred, target_names=number_to_class))
+
+import seaborn as sns
+class_indices = train_generator.class_indices
+class_names = {v: k for k, v in class_indices.items()}
+validation_generator.reset()
+predictions = model.predict(validation_generator)
+y_pred = np.argmax(predictions, axis=1)
+y_true = validation_generator.classes
+
+plt.figure(figsize=(10, 8))
+cm = confusion_matrix(y_true, y_pred)
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', 
+        xticklabels=[class_names[i] for i in range(len(class_names))],
+        yticklabels=[class_names[i] for i in range(len(class_names))])
+plt.xlabel('Previsão')
+plt.ylabel('Real')
+plt.title('Matriz de Confusão')
+plt.savefig('confusion_matrix.png')
+plt.show()
