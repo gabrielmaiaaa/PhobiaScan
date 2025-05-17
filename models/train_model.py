@@ -1,3 +1,4 @@
+import os
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
@@ -6,10 +7,8 @@ import numpy as np
 from keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 
 from sklearn.utils.class_weight import compute_class_weight
-from zmq import NULL
 
 from models.cnn import mini_Xception
-from src.utils import plotGraficos
 
 import random
 import numpy as np
@@ -21,19 +20,20 @@ tf.random.set_seed(6743)
 
 print(tf.config.list_physical_devices('GPU'))
 
-batch_size = 32
-num_epochs = 50
+# batch_size = 32
+num_epochs = 10000
 input_shape = (48, 48, 1)
 verbose = 1
 patience = 10
 
-# name = 'AffectnetGray'
+name = 'AffectnetGray'
 # name = 'Fer2013AffectnetGray'
-name = 'Fer2013'
-train_dir = 'data/' + name + '/train'
+train_dir = 'data/' + name
+# name = 'Fer2013'
+# train_dir = 'data/' + name + '/train'
 test_dir = 'data/' + name + '/test'
 
-def trainAffectnet():
+def trainAffectnet(batch_size):
     # Aumento de Dataset
     data_generator_train = ImageDataGenerator(
         width_shift_range=0.2,
@@ -77,7 +77,7 @@ def trainAffectnet():
 
     return train_generator, validation_generator
 
-def trainFer2013():
+def trainFer2013(batch_size):
     # Aumento de Dataset
     data_generator_train = ImageDataGenerator(
         width_shift_range=0.2,
@@ -117,21 +117,31 @@ def trainFer2013():
 
     return train_generator, validation_generator
 
-def trainModel(train_generator=NULL, validation_generator=NULL):
+def trainModel(l2, taxaDropout, batch_size):
     if name == 'Fer2013':
-        train_generator, validation_generator = trainFer2013()
+        train_generator, validation_generator = trainFer2013(batch_size)
     else:
-        train_generator, validation_generator = trainAffectnet()
+        train_generator, validation_generator = trainAffectnet(batch_size)
 
     num_classes = len(train_generator.class_indices)
 
-    model = mini_Xception(num_classes, input_shape)
+    model = mini_Xception(num_classes, input_shape, l2, taxaDropout)
 
     model.compile(loss='categorical_crossentropy',
                 optimizer='adam',
                 metrics=['accuracy'])
+    
+    dir = 'models/checkpoint'
 
-    model_names = "models/checkpoint/" + name + ".{epoch:02d}-{val_accuracy:.2f}.keras"
+    tamanho = 0
+
+    while os.path.exists(f"{dir}/{name}_{tamanho}"):
+        tamanho += 1
+
+    newDir = f'{dir}/{name}_{tamanho}'
+    os.makedirs(newDir,exist_ok=True)
+
+    model_names = f"{newDir}/{name}" + ".{epoch:02d}-{val_accuracy:.2f}.keras"
 
     # Callbacks Parametros
     early_stop = EarlyStopping(

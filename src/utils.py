@@ -1,6 +1,6 @@
 import os
 import shutil
-from tqdm import tqdm 
+# from tqdm import tqdm 
 import numpy as np
 
 import numpy as np
@@ -16,51 +16,51 @@ from skimage.color import rgb2gray
 from skimage.transform import resize
 
 
-def populandoDataset():
-    fer2013 = 'data/Fer2013'
-    affect = 'data/Affectnet'
+# def populandoDataset():
+#     fer2013 = 'data/Fer2013'
+#     affect = 'data/Affectnet'
 
-    newFer = os.path.join('data/Fer2013New')
+#     newFer = os.path.join('data/Fer2013New')
 
-    os.makedirs(newFer, exist_ok=True)
+#     os.makedirs(newFer, exist_ok=True)
 
-    mapeamento_emocoes = {
-        'disgust': 'disgust',
-        'fear': 'fear',
-        'neutral': 'neutral',
-        'surprise': 'surprise'
-    }
+#     mapeamento_emocoes = {
+#         'disgust': 'disgust',
+#         'fear': 'fear',
+#         'neutral': 'neutral',
+#         'surprise': 'surprise'
+#     }
 
-    os.makedirs(newFer, exist_ok=True)
-    for emocao in mapeamento_emocoes.values():
-        os.makedirs(os.path.join(newFer, emocao), exist_ok=True)
+#     os.makedirs(newFer, exist_ok=True)
+#     for emocao in mapeamento_emocoes.values():
+#         os.makedirs(os.path.join(newFer, emocao), exist_ok=True)
 
-    for diretorio, subpastas, arquivos in tqdm(os.walk(affect)):
-        current_emocao = os.path.basename(diretorio)
+#     for diretorio, subpastas, arquivos in tqdm(os.walk(affect)):
+#         current_emocao = os.path.basename(diretorio)
 
-        if current_emocao in mapeamento_emocoes:
-            emocao_destino = mapeamento_emocoes[current_emocao]
-            destino_dir = os.path.join(newFer, emocao_destino)
+#         if current_emocao in mapeamento_emocoes:
+#             emocao_destino = mapeamento_emocoes[current_emocao]
+#             destino_dir = os.path.join(newFer, emocao_destino)
 
-            for arquivo in arquivos:
-                try:
-                    img_path = os.path.join(diretorio, arquivo)
-                    image = imread(img_path)
+#             for arquivo in arquivos:
+#                 try:
+#                     img_path = os.path.join(diretorio, arquivo)
+#                     image = imread(img_path)
 
-                    if image.ndim == 3:
-                        image = rgb2gray(image)
-                    image = resize(image, (48, 48))
+#                     if image.ndim == 3:
+#                         image = rgb2gray(image)
+#                     image = resize(image, (48, 48))
 
-                    image = (image * 255).astype(np.uint8)
+#                     image = (image * 255).astype(np.uint8)
 
-                    new_filename = f"affect_{diretorio}"
-                    save_path = os.path.join(destino_dir, new_filename)
+#                     new_filename = f"affect_{diretorio}"
+#                     save_path = os.path.join(destino_dir, new_filename)
                     
-                    imsave(save_path, image)
+#                     imsave(save_path, image)
 
-                except Exception as e:
-                    print(f'Erro ao processar: {arquivo}, {e}')
-                    continue
+#                 except Exception as e:
+#                     print(f'Erro ao processar: {arquivo}, {e}')
+#                     continue
 
 def plotGraficos(final_model_filename, validation_generator, train_generator, val_acc, type, dir):
     model = load_model(final_model_filename)
@@ -112,4 +112,21 @@ def plotGraficos(final_model_filename, validation_generator, train_generator, va
     plt.ylabel('Real')
     plt.title('Matriz de Confusão ' + type)
     plt.savefig(f'{dir}/confusion_matrix_{type}_{val_acc:.2f}.png')
-    plt.show()
+    # plt.show()
+
+def saveTxt(newDir, val_acc, val_loss, l2, dropout, batch_size, time):
+    with open(f'{newDir}/data.txt', 'w') as f:
+        f.write(f'----Best----\n')
+        f.write(f'Valor da acurácia: {val_acc['Best']} \n')
+        f.write(f'Valor da perda: {val_loss['Best']} \n')
+        f.write(f'\n-----Last----\n')
+        f.write(f'Valor da acurácia: {val_acc['Last']} \n')
+        f.write(f'Valor da perda: {val_loss['Last']} \n')
+        f.write(f'\n-----L2----\n')
+        f.write(f'Valor da L2 Regularization: {l2} \n')
+        f.write(f'\n-----Dropout----\n')
+        f.write(f'Valor do Dropout: {dropout} \n')
+        f.write(f'\n-----Batch Size----\n')
+        f.write(f'Batch Size: {batch_size} \n')
+        f.write(f'\n-----Time----\n')
+        f.write(f'Time gasto: {time} \n')

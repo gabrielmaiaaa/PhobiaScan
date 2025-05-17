@@ -10,7 +10,7 @@ import tensorflow as tf
 from tensorflow.keras.layers import Dense
 
 
-def mini_Xception(num_classes, input_shape, l2_regularization = 0.01):
+def mini_Xception(num_classes, input_shape, l2_regularization, drop):
     regularization = l2(l2_regularization)
 
     img_input = Input(input_shape)
@@ -43,7 +43,7 @@ def mini_Xception(num_classes, input_shape, l2_regularization = 0.01):
         x = BatchNormalization()(x)
 
         x = MaxPooling2D((3, 3), strides=(2, 2), padding='same')(x)
-        x = Dropout(0.3)(x)
+        x = Dropout(drop)(x)
         x = layers.add([x, residual])
 
     x = Conv2D(num_classes, (3, 3), 
