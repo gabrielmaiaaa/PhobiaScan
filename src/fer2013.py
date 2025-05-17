@@ -33,7 +33,8 @@ datagen_train = ImageDataGenerator(
     validation_split=0.2  
 )
 datagen_test = ImageDataGenerator(
-    rescale=1./255
+    rescale=1./255,
+    validation_split = 0.2 
 )
 
 # Gerador de treino (80% do dir_train)

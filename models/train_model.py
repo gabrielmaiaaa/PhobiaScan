@@ -6,6 +6,7 @@ import numpy as np
 from keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 
 from sklearn.utils.class_weight import compute_class_weight
+from zmq import NULL
 
 from models.cnn import mini_Xception
 from src.utils import plotGraficos
@@ -21,17 +22,18 @@ tf.random.set_seed(6743)
 print(tf.config.list_physical_devices('GPU'))
 
 batch_size = 32
-num_epochs = 10000
+num_epochs = 50
 input_shape = (48, 48, 1)
 verbose = 1
 patience = 10
 
-name = 'AffectnetGray'
+# name = 'AffectnetGray'
 # name = 'Fer2013AffectnetGray'
-# name = 'Fer2013'
-train_dir = 'data/' + name
+name = 'Fer2013'
+train_dir = 'data/' + name + '/train'
+test_dir = 'data/' + name + '/test'
 
-def train():
+def trainAffectnet():
     # Aumento de Dataset
     data_generator_train = ImageDataGenerator(
         width_shift_range=0.2,
@@ -73,6 +75,54 @@ def train():
         shuffle=False
     )
 
+    return train_generator, validation_generator
+
+def trainFer2013():
+    # Aumento de Dataset
+    data_generator_train = ImageDataGenerator(
+        width_shift_range=0.2,
+        height_shift_range=0.2,
+        rotation_range=10,
+        horizontal_flip=True,
+        featurewise_center=False,
+        featurewise_std_normalization=False,
+        brightness_range=[0.3, 1.2],
+        zoom_range=0.2,
+        fill_mode='nearest',
+        rescale=1./255
+    )
+
+    data_generator_test = ImageDataGenerator(
+        rescale=1./255
+    )
+
+    # Disctribuição de 80/20 para trinamento e validação
+    train_generator = data_generator_train.flow_from_directory(
+        directory=train_dir,
+        target_size=(48, 48),
+        batch_size=batch_size,
+        color_mode="grayscale",
+        class_mode="categorical",
+        shuffle=True
+    )
+
+    validation_generator = data_generator_test.flow_from_directory(
+        directory=test_dir,
+        target_size=(48, 48),
+        batch_size=batch_size,
+        color_mode="grayscale",
+        class_mode="categorical",
+        shuffle=False
+    )
+
+    return train_generator, validation_generator
+
+def trainModel(train_generator=NULL, validation_generator=NULL):
+    if name == 'Fer2013':
+        train_generator, validation_generator = trainFer2013()
+    else:
+        train_generator, validation_generator = trainAffectnet()
+
     num_classes = len(train_generator.class_indices)
 
     model = mini_Xception(num_classes, input_shape)
@@ -81,7 +131,7 @@ def train():
                 optimizer='adam',
                 metrics=['accuracy'])
 
-    model_names = "models/checkpoint/checkpoint_fer2013_.{epoch:02d}-{val_accuracy:.2f}.keras"
+    model_names = "models/checkpoint/" + name + ".{epoch:02d}-{val_accuracy:.2f}.keras"
 
     # Callbacks Parametros
     early_stop = EarlyStopping(

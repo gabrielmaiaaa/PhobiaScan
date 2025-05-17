@@ -1,8 +1,8 @@
 import os
-from models.train_model import train
+from models.train_model import trainModel
 from src.utils import plotGraficos
 
-hist, model, validation_generator, train_generator, name = train()
+hist, model, validation_generator, train_generator, name = trainModel()
 
 dir = 'models/tests'
 
