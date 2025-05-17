@@ -13,7 +13,6 @@ from skimage.color import rgb2gray
 
 # docker run --gpus all -it -v "C:\Users\gmara\Documents\Sourcetree\PhobiaScan:/tf/PhobiaScan" -w /tf/PhobiaScan tf-gpu-custom python -m src.fer2013
 
-
 # docker run --gpus all -it -v "C:\Users\gmara\.nv:/root/.nv" -v "C:\Users\gmara\Documents\Sourcetree\PhobiaScan:/tf/PhobiaScan" -w /tf/PhobiaScan tf-gpu-custom python -m src.fer2013
 
 from models.cnn import fine_tuning_Mini_Xception, mini_Xception
@@ -84,7 +83,9 @@ verbose = 1
 
 model = mini_Xception(num_classes, input_shape)
 
-model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+model.compile(loss='categorical_crossentropy', 
+              optimizer='adam', 
+              metrics=['accuracy'])
 
 early_stop = EarlyStopping(
     monitor='val_loss',
