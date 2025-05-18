@@ -3,8 +3,8 @@ import time
 from models.train_model import trainModel
 from src.utils import plotGraficos, saveTxt
 
-l2_regularization = [0.01, 0.05]
-dropout = [0.3, 0.4, 0.5]
+l2_regularization = [0.0001, 0.001, 0.005, 0.01, 0.05]
+dropout = [0.2, 0.3, 0.4, 0.5, 0.6]
 batch_size = [16, 32, 64]
 for l2 in l2_regularization:
     for taxaDropout in dropout:

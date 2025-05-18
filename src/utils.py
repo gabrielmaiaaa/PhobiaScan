@@ -96,6 +96,22 @@ def plotGraficos(final_model_filename, validation_generator, train_generator, va
     print("Relatório de classificação (Teste):")
     print(classification_report(y_test_true, y_test_pred, target_names=number_to_class))
 
+    report = classification_report(
+        y_test_true, y_test_pred, target_names=number_to_class, output_dict=True
+    )
+
+    class_names = number_to_class
+    metrics = ['precision', 'recall', 'f1-score']
+    data = np.array([[report[cls][metric] for metric in metrics] for cls in class_names])
+
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(data, annot=True, cmap='Blues', vmin=0, vmax=1,
+                xticklabels=metrics, yticklabels=class_names)
+    plt.xlabel('Métrica')
+    plt.ylabel('Classe')
+    plt.title('Classification Report ' + type)
+    plt.savefig(f'{dir}/classification_report_{type}.png')
+
     class_indices = train_generator.class_indices
     class_names = {v: k for k, v in class_indices.items()}
     validation_generator.reset()
@@ -117,11 +133,11 @@ def plotGraficos(final_model_filename, validation_generator, train_generator, va
 def saveTxt(newDir, val_acc, val_loss, l2, dropout, batch_size, time):
     with open(f'{newDir}/data.txt', 'w') as f:
         f.write(f'----Best----\n')
-        f.write(f'Valor da acurácia: {val_acc['Best']} \n')
-        f.write(f'Valor da perda: {val_loss['Best']} \n')
+        f.write(f"Valor da acurácia: {val_acc['Best']} \n")
+        f.write(f"Valor da perda: {val_loss['Best']} \n")
         f.write(f'\n-----Last----\n')
-        f.write(f'Valor da acurácia: {val_acc['Last']} \n')
-        f.write(f'Valor da perda: {val_loss['Last']} \n')
+        f.write(f"Valor da acurácia: {val_acc['Last']} \n")
+        f.write(f"Valor da perda: {val_loss['Last']} \n")
         f.write(f'\n-----L2----\n')
         f.write(f'Valor da L2 Regularization: {l2} \n')
         f.write(f'\n-----Dropout----\n')
