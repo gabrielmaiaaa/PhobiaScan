@@ -1,8 +1,8 @@
 import os
 import shutil
 # from tqdm import tqdm 
-import numpy as np
 
+import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -62,7 +62,7 @@ from skimage.transform import resize
 #                     print(f'Erro ao processar: {arquivo}, {e}')
 #                     continue
 
-def plotGraficos(final_model_filename, validation_generator, train_generator, val_acc, type, dir):
+def plotGraficos(final_model_filename, validation_generator, train_generator, val_acc, type, dir, hist):
     model = load_model(final_model_filename)
 
     my_image_path = "../PhobiaScan/data/gab/Color/gab.153.jpg"
@@ -130,19 +130,88 @@ def plotGraficos(final_model_filename, validation_generator, train_generator, va
     plt.savefig(f'{dir}/confusion_matrix_{type}_{val_acc:.2f}.png')
     # plt.show()
 
-def saveTxt(newDir, val_acc, val_loss, l2, dropout, batch_size, time):
+    plt.figure(figsize=(8, 6))
+    plt.plot(hist.history['loss'])
+    plt.plot(hist.history['val_loss'])
+    plt.title('Model loss')
+    plt.ylabel('Loss')
+    plt.xlabel('Epoch')
+    plt.legend(['Train', 'Val'], loc='upper right')
+    plt.savefig(f'{dir}/model_loss_{type}.png')
+
+    plt.figure(figsize=(8, 6))
+    plt.plot(hist.history['accuracy'])
+    plt.plot(hist.history['val_accuracy'])
+    plt.title('Model accuracy')
+    plt.ylabel('Acurácia')
+    plt.xlabel('Epoch')
+    plt.legend(['Train', 'Val'], loc='lower right')
+    plt.savefig(f'{dir}/model_accuracy_{type}.png')
+
+def saveTxt(newDir, best, last, l2, dropout, time):
     with open(f'{newDir}/data.txt', 'w') as f:
         f.write(f'----Best----\n')
-        f.write(f"Valor da acurácia: {val_acc['Best']} \n")
-        f.write(f"Valor da perda: {val_loss['Best']} \n")
+        f.write(f"Valor da accuracy: {best['acc']} \n")
+        f.write(f"Valor da loss: {best['loss']} \n")
+        f.write(f"Valor da val_acc: {best['val_acc']} \n")
+        f.write(f"Valor da val_loss: {best['val_loss']} \n")
+        f.write(f"Época: {best['epoch']} \n")
         f.write(f'\n-----Last----\n')
-        f.write(f"Valor da acurácia: {val_acc['Last']} \n")
-        f.write(f"Valor da perda: {val_loss['Last']} \n")
+        f.write(f"Valor da accuracy: {last['acc']} \n")
+        f.write(f"Valor da loss: {last['loss']} \n")
+        f.write(f"Valor da val_acc: {last['val_acc']} \n")
+        f.write(f"Valor da val_loss: {last['val_loss']} \n")
+        f.write(f"Época: {last['epoch']} \n")
         f.write(f'\n-----L2----\n')
         f.write(f'Valor da L2 Regularization: {l2} \n')
         f.write(f'\n-----Dropout----\n')
         f.write(f'Valor do Dropout: {dropout} \n')
-        f.write(f'\n-----Batch Size----\n')
-        f.write(f'Batch Size: {batch_size} \n')
         f.write(f'\n-----Time----\n')
         f.write(f'Time gasto: {time} \n')
+
+def saveCsv(name, best, last, diretorio, l2, dropout, min_lr, factor, patience, patienceReduce, batch_size, time):
+    df = pd.read_csv('models/data.csv')
+
+    newDataBest = {'name': name, 
+                   'type': 'best', 
+                   'diretorio': diretorio, 
+                   'accuracy': best['acc'], 
+                   'loss': best['loss'], 
+                   'val_accuracy': best['val_acc'], 
+                   'val_loss': best['val_loss'], 
+                   'l2': l2, 
+                   'dropout': dropout, 
+                   'min_lr': min_lr, 
+                   'factor': factor,
+                   'patience': patience, 
+                   'patienceReduce': patienceReduce, 
+                   'batch_size': batch_size, 
+                   'epoch': best['epoch'], 
+                   'time': time
+                   }
+    
+    newDataLast = {'name': name, 
+                   'type': 'last', 
+                   'diretorio': diretorio, 
+                   'accuracy': last['acc'], 
+                   'loss': last['loss'], 
+                   'val_accuracy': last['val_acc'], 
+                   'val_loss': last['val_loss'], 
+                   'l2': l2, 
+                   'dropout': dropout, 
+                   'min_lr': min_lr, 
+                   'factor': factor,
+                   'patience': patience, 
+                   'patienceReduce': patienceReduce, 
+                   'batch_size': batch_size, 
+                   'epoch': last['epoch'], 
+                   'time': time
+                   }
+    
+    df_new_best = pd.DataFrame([newDataBest])
+    df_new_last = pd.DataFrame([newDataLast])
+
+    df = pd.concat([df, df_new_best, df_new_last], ignore_index=True)
+
+
+    df.to_csv("models/data.csv", index=False)

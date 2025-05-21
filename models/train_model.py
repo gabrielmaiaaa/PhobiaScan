@@ -2,8 +2,6 @@ import os
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
-import numpy as np
-
 from keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 
 from sklearn.utils.class_weight import compute_class_weight
@@ -13,6 +11,7 @@ from models.cnn import mini_Xception
 import random
 import numpy as np
 import tensorflow as tf
+import matplotlib.pyplot as plt
 
 random.seed(6743)
 np.random.seed(6743)
@@ -20,11 +19,15 @@ tf.random.set_seed(6743)
 
 print(tf.config.list_physical_devices('GPU'))
 
-# batch_size = 32
+batch_size = 64
 num_epochs = 10000
 input_shape = (48, 48, 1)
 verbose = 1
 patience = 10
+# min_lr = 1e-6
+# factor = 0.2
+# patienceReduce = int(patience/2)
+patienceReduce = int(patience/4)
 
 name = 'AffectnetGray'
 # name = 'Fer2013AffectnetGray'
@@ -33,7 +36,7 @@ train_dir = 'data/' + name
 # train_dir = 'data/' + name + '/train'
 test_dir = 'data/' + name + '/test'
 
-def trainAffectnet(batch_size):
+def trainAffectnet():
     # Aumento de Dataset
     data_generator_train = ImageDataGenerator(
         width_shift_range=0.2,
@@ -46,12 +49,12 @@ def trainAffectnet(batch_size):
         zoom_range=0.2,
         fill_mode='nearest',
         rescale=1./255,
-        validation_split = 0.2 
+        validation_split = 0.2
     )
 
     data_generator_test = ImageDataGenerator(
         rescale=1./255,
-        validation_split = 0.2 
+        validation_split = 0.2
     )
 
     # Disctribuição de 80/20 para trinamento e validação
@@ -77,7 +80,7 @@ def trainAffectnet(batch_size):
 
     return train_generator, validation_generator
 
-def trainFer2013(batch_size):
+def trainFer2013():
     # Aumento de Dataset
     data_generator_train = ImageDataGenerator(
         width_shift_range=0.2,
@@ -117,11 +120,11 @@ def trainFer2013(batch_size):
 
     return train_generator, validation_generator
 
-def trainModel(l2, taxaDropout, batch_size):
+def trainModel(l2, taxaDropout, factor, min_lr):
     if name == 'Fer2013':
-        train_generator, validation_generator = trainFer2013(batch_size)
+        train_generator, validation_generator = trainFer2013()
     else:
-        train_generator, validation_generator = trainAffectnet(batch_size)
+        train_generator, validation_generator = trainAffectnet()
 
     num_classes = len(train_generator.class_indices)
 
@@ -131,7 +134,7 @@ def trainModel(l2, taxaDropout, batch_size):
                 optimizer='adam',
                 metrics=['accuracy'])
     
-    dir = 'models/checkpoint'
+    dir = 'models/checkpoint/' + name
 
     tamanho = 0
 
@@ -159,9 +162,9 @@ def trainModel(l2, taxaDropout, batch_size):
 
     reduce_lr = ReduceLROnPlateau(
         'val_loss',
-        factor=0.1,
-        patience=int(patience/4),
-        min_lr=0.00001,
+        factor=factor,
+        patience=patienceReduce,
+        min_lr=min_lr,
         verbose=verbose
     )
 
@@ -173,6 +176,8 @@ def trainModel(l2, taxaDropout, batch_size):
     )
 
     class_weight_dict = dict(enumerate(class_weights))
+    print(class_weight_dict)
+    class_weight_dict[0] *= 2
 
     hist = model.fit(
         train_generator,
@@ -185,4 +190,5 @@ def trainModel(l2, taxaDropout, batch_size):
         callbacks=[checkpoint, early_stop, reduce_lr]
     )
 
-    return hist, model, validation_generator, train_generator, name
+    # return hist, model, validation_generator, train_generator, name, min_lr, patience, batch_size, factor
+    return hist, model, validation_generator, train_generator, name, patience, patienceReduce, batch_size

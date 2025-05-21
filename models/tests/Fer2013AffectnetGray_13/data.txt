@@ -1,0 +1,19 @@
+----Best----
+Valor da acurácia: 0.49746593832969666 
+Valor da perda: 1.1414108276367188 
+
+-----Last----
+Valor da acurácia: 0.482895165681839 
+Valor da perda: 1.1533081531524658 
+
+-----L2----
+Valor da L2 Regularization: 0.0001 
+
+-----Dropout----
+Valor do Dropout: 0.6 
+
+-----Batch Size----
+Batch Size: 32 
+
+-----Time----
+Time gasto: 2041.1207068209987 

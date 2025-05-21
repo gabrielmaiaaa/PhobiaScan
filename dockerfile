@@ -7,4 +7,6 @@ RUN pip install --no-cache-dir --upgrade \
     scikit-image \
     numpy \
     seaborn \
-    scikit-learn
+    scikit-learn \
+    keras_tuner \
+    pandas
