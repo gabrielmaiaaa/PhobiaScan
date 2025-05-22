@@ -213,5 +213,30 @@ def saveCsv(name, best, last, diretorio, l2, dropout, min_lr, factor, patience, 
 
     df = pd.concat([df, df_new_best, df_new_last], ignore_index=True)
 
-
     df.to_csv("models/data.csv", index=False)
+
+def manipularCsv():
+    pd.set_option('display.max_columns', 16)
+    df = pd.read_csv('models/data.csv')
+
+    idx = df['accuracy'].idxmax()
+    dfBestAccuracy = df.loc[idx]
+
+    idx = df['val_accuracy'].idxmax()
+    dfBestValAccuracy = df.loc[idx]
+    
+    idx = df['val_loss'].idxmin()
+    dfBestValLoss = df.loc[idx]
+
+    tempoGasto = df['time'].sum()
+
+    top5A = df.nlargest(10, 'accuracy')
+    top5V = df.nlargest(10, 'val_accuracy')
+    top5L = df.nsmallest(10, 'val_loss')
+
+    print(top5A)
+    print('---'*20)
+    print(top5V)
+    print('---'*20)
+    print(top5L)
+    print(tempoGasto)

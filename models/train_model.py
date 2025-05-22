@@ -19,15 +19,15 @@ tf.random.set_seed(6743)
 
 print(tf.config.list_physical_devices('GPU'))
 
-batch_size = 64
+batch_size = 16
 num_epochs = 10000
 input_shape = (48, 48, 1)
 verbose = 1
 patience = 10
 # min_lr = 1e-6
 # factor = 0.2
-# patienceReduce = int(patience/2)
-patienceReduce = int(patience/4)
+patienceReduce = int(patience/2)
+# patienceReduce = int(patience/4)
 
 name = 'AffectnetGray'
 # name = 'Fer2013AffectnetGray'
