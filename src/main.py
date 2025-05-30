@@ -4,7 +4,7 @@ from models.train_model import trainModel
 from models.hyperparamentos import hyperparametro
 from src.utils import plotGraficos, saveCsv, saveTxt, manipularCsv
 
-l2_regularization = [0.005]
+l2_regularization = [0.05]
 dropout = [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
 # batch_size = [16, 32, 64]
 #     for taxaDropout in dropout:
