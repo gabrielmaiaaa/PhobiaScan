@@ -26,11 +26,11 @@ verbose = 1
 patience = 10
 # min_lr = 1e-6
 # factor = 0.2
-patienceReduce = int(patience/2)
+# patienceReduce = int(patience/2)
 # patienceReduce = int(patience/4)
 
-# name = 'AffectnetGray'
-name = 'Fer2013AffectnetGray'
+name = 'AffectnetGray'
+# name = 'Fer2013AffectnetGray'
 train_dir = 'data/' + name
 # name = 'Fer2013'
 # train_dir = 'data/' + name + '/train'
@@ -120,7 +120,7 @@ def trainFer2013():
 
     return train_generator, validation_generator
 
-def trainModel(l2, taxaDropout, factor, min_lr):
+def trainModel(l2, taxaDropout, factor, min_lr, patienceReduce):
     if name == 'Fer2013':
         train_generator, validation_generator = trainFer2013()
     else:
@@ -191,4 +191,4 @@ def trainModel(l2, taxaDropout, factor, min_lr):
     )
 
     # return hist, model, validation_generator, train_generator, name, min_lr, patience, batch_size, factor
-    return hist, model, validation_generator, train_generator, name, patience, patienceReduce, batch_size
+    return hist, model, validation_generator, train_generator, name, patience, batch_size
