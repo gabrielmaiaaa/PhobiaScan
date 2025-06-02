@@ -5,7 +5,7 @@ from models.hyperparamentos import hyperparametro
 from src.utils import plotGraficos, saveCsv, saveTxt, manipularCsv
 
 l2_regularization = [0.0001]
-dropout = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
+dropout = [0.6, 0.7, 0.8]
 # batch_size = [16, 32, 64]
 #     for taxaDropout in dropout:
 #         for batch in batch_size:
