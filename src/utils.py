@@ -216,7 +216,7 @@ def saveCsv(name, best, last, diretorio, l2, dropout, min_lr, factor, patience, 
     df.to_csv('models/'+name+'.csv', index=False)
 
 def manipularCsv():
-    pd.set_option('display.max_columns', 16)
+    pd.set_option('display.max_columns', 17)
     df = pd.read_csv('models/AffectnetGray.csv')
 
     idx = df['accuracy'].idxmax()
@@ -230,9 +230,9 @@ def manipularCsv():
 
     tempoGasto = df['time'].sum()
 
-    top5A = df.nlargest(20, 'accuracy')
-    top5V = df.nlargest(20, 'val_accuracy')
-    top5L = df.nsmallest(20, 'val_loss')
+    top5A = df.nlargest(10, 'accuracy')
+    top5V = df.nlargest(10, 'val_accuracy')
+    top5L = df.nsmallest(10, 'val_loss')
 
     print(top5A)
     print('---'*20)
