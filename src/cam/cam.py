@@ -12,17 +12,16 @@ def get_models():
 
     # Caminhos dos modelos
     model_paths = {
-        'yolo': os.path.abspath(os.path.join(current_dir, '..', '..', 'models', 'cam', 'yolov8n-face.pt')),
-        'mini_xception': os.path.abspath(os.path.join(current_dir, '..', '..', 'models', 'mini_Xception',
-                                                       'fer2013_mini_XCEPTION.119-0.65.hdf5')),
-        'mini_xceptionFine': os.path.abspath(os.path.join(current_dir, '..', '..', 
-                                                          'mini_xception_finetuned.h5'))
-        # 'mini_xception': os.path.abspath(os.path.join(current_dir, '..', '..', 'modelo_emocoes.keras'))
+        'yolo': 'models/cam/yolov8n-face.pt',
+        'mini_xception406': 'models/tests/AffectnetGray/AffectnetGray_406/Best_28_loss_1.1227_acc_0.59.keras',
+        'mini_xception410': 'models/tests/AffectnetGray/AffectnetGray_410/Best_16_loss_1.1006_acc_0.59.keras',
+        'mini_xception12': 'models/tests/AffectnetGray/AffectnetGray_12/Best_20_loss_1.1719_acc_0.58.keras',
+        'mini_xception5': 'models/tests/Fer2013AffectnetGray/Fer2013AffectnetGray_5/Best_11_loss_1.1520_acc_0.57.keras'
     }
 
     # Carregando modelos
     model_face = YOLO(model_paths['yolo'])
-    model_mini_xception = load_model(model_paths['mini_xceptionFine'], compile=False)
+    model_mini_xception = load_model(model_paths['mini_xception406'])
 
     return model_face, model_mini_xception, emotion_labels
 

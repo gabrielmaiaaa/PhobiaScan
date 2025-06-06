@@ -178,7 +178,7 @@ def trainModel(l2, taxaDropout, factor, min_lr):
     class_weight_dict = dict(enumerate(class_weights))
     print(class_weight_dict)
     class_weight_dict[0] *= 2
-    class_weight_dict[3] *= 2
+    class_weight_dict[3] *= 1.5
 
     hist = model.fit(
         train_generator,

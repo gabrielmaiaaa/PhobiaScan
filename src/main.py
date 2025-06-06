@@ -5,20 +5,20 @@ from models.hyperparamentos import hyperparametro
 from src.utils import plotGraficos, saveCsv, saveTxt, manipularCsv
 
 # l2_regularization = [0.0001]
+dropout = [0.2]
+# batch_size = [16, 32, 64]
+#     for taxaDropout in dropout:
+#         for batch in batch_size:
+# l2 = 0.002789250672351807
+# taxaDropout = 0.3
 # dropout = [0.1, 0.2]
-# # batch_size = [16, 32, 64]
-# #     for taxaDropout in dropout:
-# #         for batch in batch_size:
-# # l2 = 0.002789250672351807
-# # taxaDropout = 0.3
-# # dropout = [0.1, 0.2]
-# factors = [0.1, 0.2, 0.3]
-# min_lrs = [1e-5, 1e-6]
-# l2 = 0.0001
-# # taxaDropout = 0.2
-# # factor = 0.2
-# # min_lr = 1e-6
-# # for l2 in l2_regularization:
+factors = [0.1, 0.2, 0.3]
+min_lrs = [1e-5, 1e-6]
+l2 = 0.0001
+# taxaDropout = 0.2
+# factor = 0.2
+# min_lr = 1e-6
+# for l2 in l2_regularization:
 # for taxaDropout in dropout:
 #     for factor in factors:
 #         for min_lr in min_lrs:
@@ -79,7 +79,7 @@ from src.utils import plotGraficos, saveCsv, saveTxt, manipularCsv
 #             saveTxt(newDir, best, last, l2, taxaDropout, fim-inicio)
 #             saveCsv(name,best,last,newDir,l2,taxaDropout,min_lr,factor,patience,patienceReduce,batch_size,fim-inicio)
 
-# # hyperparametro()
+# hyperparametro()
 
 manipularCsv()
 
