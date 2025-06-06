@@ -21,7 +21,7 @@ print(tf.config.list_physical_devices('GPU'))
 
 batch_size = 32
 num_epochs = 10000
-input_shape = (48, 48, 1)
+input_shape = (75, 75, 1)
 verbose = 1
 patience = 10
 # min_lr = 1e-6
@@ -29,12 +29,13 @@ patience = 10
 patienceReduce = int(patience/2)
 # patienceReduce = int(patience/4)
 
-name = 'AffectnetGray'
+# name = 'AffectnetGray'
+name = 'RAF-DB'
 # name = 'Fer2013AffectnetGray'
-train_dir = 'data/' + name
+# train_dir = 'data/' + name
 # name = 'Fer2013'
-# train_dir = 'data/' + name + '/train'
-test_dir = 'data/' + name + '/test'
+train_dir = 'data/' + name + '/train'
+val_dir = 'data/' + name + '/val'
 
 def trainAffectnet():
     # Aumento de Dataset
@@ -60,7 +61,7 @@ def trainAffectnet():
     # Disctribuição de 80/20 para trinamento e validação
     train_generator = data_generator_train.flow_from_directory(
         directory=train_dir,
-        target_size=(48, 48),
+        target_size=(75, 75),
         batch_size=batch_size,
         color_mode="grayscale",
         class_mode="categorical",
@@ -70,7 +71,7 @@ def trainAffectnet():
 
     validation_generator = data_generator_test.flow_from_directory(
         directory=train_dir,
-        target_size=(48, 48),
+        target_size=(75, 75),
         batch_size=batch_size,
         color_mode="grayscale",
         class_mode="categorical",
@@ -102,7 +103,7 @@ def trainFer2013():
     # Disctribuição de 80/20 para trinamento e validação
     train_generator = data_generator_train.flow_from_directory(
         directory=train_dir,
-        target_size=(48, 48),
+        target_size=(75, 75),
         batch_size=batch_size,
         color_mode="grayscale",
         class_mode="categorical",
@@ -110,8 +111,8 @@ def trainFer2013():
     )
 
     validation_generator = data_generator_test.flow_from_directory(
-        directory=test_dir,
-        target_size=(48, 48),
+        directory=val_dir,
+        target_size=(75, 75),
         batch_size=batch_size,
         color_mode="grayscale",
         class_mode="categorical",
@@ -121,7 +122,7 @@ def trainFer2013():
     return train_generator, validation_generator
 
 def trainModel(l2, taxaDropout, factor, min_lr):
-    if name == 'Fer2013':
+    if name == 'Fer2013' or name == 'RAF-DB':
         train_generator, validation_generator = trainFer2013()
     else:
         train_generator, validation_generator = trainAffectnet()
@@ -177,8 +178,9 @@ def trainModel(l2, taxaDropout, factor, min_lr):
 
     class_weight_dict = dict(enumerate(class_weights))
     print(class_weight_dict)
-    class_weight_dict[0] *= 2
-    class_weight_dict[3] *= 1.5
+    # class_weight_dict[0] *= 2
+    # class_weight_dict[2] *= 1.5
+    # class_weight_dict[3] *= 2
 
     hist = model.fit(
         train_generator,

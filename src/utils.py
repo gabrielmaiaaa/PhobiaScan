@@ -62,6 +62,38 @@ from skimage.transform import resize
 #                     print(f'Erro ao processar: {arquivo}, {e}')
 #                     continue
 
+def test(final_model_filename):
+    model = load_model(final_model_filename)
+
+    my_image_path = "../PhobiaScan/data/gab/Gray/gab_Gray.132.jpg"
+    my_image = imread(my_image_path)
+
+
+    if my_image.ndim == 3:
+        my_image_gray = rgb2gray(resize(my_image, (48, 48)))
+    else:
+        my_image_gray = resize(my_image, (48, 48))
+
+    my_image_gray = np.expand_dims(my_image_gray, axis=-1) 
+    my_image_gray = np.expand_dims(my_image_gray, axis=0)  
+    my_image_gray = my_image_gray.astype('float32') / 255.0
+    print(my_image_gray.shape)
+
+    probabilities = model.predict(my_image_gray)[0]  # <- Atenção aqui!
+    print(probabilities)
+
+
+    number_to_class = {
+        0: 'disgust',
+        1: 'fear',
+        2: 'neutral',
+        3: 'surprise'
+    }
+
+    for i in range(len(number_to_class)):
+        print(f"{i+1}ª classe mais provável: {number_to_class[i]} -- Probabilidade: {probabilities[i]:.3f}")
+
+
 def plotGraficos(final_model_filename, validation_generator, train_generator, val_acc, type, dir, hist):
     model = load_model(final_model_filename)
 

@@ -13,15 +13,20 @@ def get_models():
     # Caminhos dos modelos
     model_paths = {
         'yolo': 'models/cam/yolov8n-face.pt',
-        'mini_xception406': 'models/tests/AffectnetGray/AffectnetGray_406/Best_28_loss_1.1227_acc_0.59.keras',
-        'mini_xception410': 'models/tests/AffectnetGray/AffectnetGray_410/Best_16_loss_1.1006_acc_0.59.keras',
+        'mini_xception406Boazinha': 'models/tests/AffectnetGray/AffectnetGray_406/Best_28_loss_1.1227_acc_0.59.keras',
+        'mini_xception410Ruim': 'models/tests/AffectnetGray/AffectnetGray_410/Best_16_loss_1.1006_acc_0.59.keras',
         'mini_xception12': 'models/tests/AffectnetGray/AffectnetGray_12/Best_20_loss_1.1719_acc_0.58.keras',
-        'mini_xception5': 'models/tests/Fer2013AffectnetGray/Fer2013AffectnetGray_5/Best_11_loss_1.1520_acc_0.57.keras'
+        'mini_xception5Boazinha': 'models/tests/Fer2013AffectnetGray/Fer2013AffectnetGray_5/Best_11_loss_1.1520_acc_0.57.keras',
+        'mini_xception477': 'models/tests/AffectnetGray/AffectnetGray_477/Best_9_loss_1.0983_acc_0.56.keras',
+        'mini_xception479': 'models/tests/AffectnetGray/AffectnetGray_479/Best_10_loss_1.1092_acc_0.57.keras',
+        'mini_xception480': 'models/tests/AffectnetGray/AffectnetGray_480/Best_16_loss_1.1995_acc_0.57.keras',
+        'mini_xception481': 'models/tests/AffectnetGray/AffectnetGray_481/Best_16_loss_1.1472_acc_0.56.keras',
+        'mini_xception4': 'models/tests/RAF-DB/RAF-DB_4/Best_119_loss_0.3028_acc_0.92.keras'
     }
 
     # Carregando modelos
     model_face = YOLO(model_paths['yolo'])
-    model_mini_xception = load_model(model_paths['mini_xception406'])
+    model_mini_xception = load_model(model_paths['mini_xception4'])
 
     return model_face, model_mini_xception, emotion_labels
 
@@ -78,11 +83,15 @@ def detect(img, name, img_id, models):
             # Aplicando o preprocessamento para noso modelo consequir analisar a imagem
             roi_gray = cv2.cvtColor(roi_img, cv2.COLOR_BGR2GRAY)
             roi_resized = cv2.resize(roi_gray, (48, 48))
+            roi_resized = roi_resized.astype('float32')  # Adicione esta linha
+            cv2.imwrite('debug_detect.png', roi_resized)  # Salva o ROI processado
             roi_normalized = roi_resized / 255.0
             roi_reshaped = np.expand_dims(roi_normalized, axis=(0, -1))
+            print(roi_reshaped.shape)
             
             # Modelo nosso devolvendo nossa probabilidade e qual emoção é
-            probabilities = model_mini_xception.predict(roi_reshaped, verbose=0)
+            probabilities = model_mini_xception.predict(roi_reshaped)
+            print(img_id)
             print(probabilities)
             predicted_class = np.argmax(probabilities)
             print(predicted_class)
