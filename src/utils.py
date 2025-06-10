@@ -97,25 +97,25 @@ def test(final_model_filename):
 def plotGraficos(final_model_filename, validation_generator, train_generator, val_acc, type, dir, hist):
     model = load_model(final_model_filename)
 
-    my_image_path = "../PhobiaScan/data/gab/Color/gab.153.jpg"
-    my_image = imread(my_image_path)
+    # my_image_path = "../PhobiaScan/data/gab/Color/gab.153.jpg"
+    # my_image = imread(my_image_path)
 
-    if my_image.ndim == 3:
-        my_image_gray = rgb2gray(resize(my_image, (48, 48)))
-    else:
-        my_image_gray = resize(my_image, (48, 48))
+    # if my_image.ndim == 3:
+    #     my_image_gray = rgb2gray(resize(my_image, (48, 48)))
+    # else:
+    #     my_image_gray = resize(my_image, (48, 48))
 
-    my_image_gray = np.expand_dims(my_image_gray, axis=-1) 
-    my_image_gray = np.expand_dims(my_image_gray, axis=0)  
-    my_image_gray = my_image_gray.astype('float32') / 255.0
+    # my_image_gray = np.expand_dims(my_image_gray, axis=-1) 
+    # my_image_gray = np.expand_dims(my_image_gray, axis=0)  
+    # my_image_gray = my_image_gray.astype('float32') / 255.0
 
-    probabilities = model.predict(my_image_gray)
+    # probabilities = model.predict(my_image_gray)
 
-    number_to_class = list(train_generator.class_indices.keys())
+    # number_to_class = list(train_generator.class_indices.keys())
 
-    index = np.argsort(probabilities[0, :])[::-1]
-    for i in range(min(5, len(number_to_class))):
-        print(f"{i+1}ª classe mais provável: {number_to_class[index[i]]} -- Probabilidade: {probabilities[0, index[i]]:.3f}")
+    # index = np.argsort(probabilities[0, :])[::-1]
+    # for i in range(min(5, len(number_to_class))):
+    #     print(f"{i+1}ª classe mais provável: {number_to_class[index[i]]} -- Probabilidade: {probabilities[0, index[i]]:.3f}")
 
     y_test_pred = model.predict(validation_generator)
     y_test_pred = np.argmax(y_test_pred, axis=1)
@@ -249,7 +249,7 @@ def saveCsv(name, best, last, diretorio, l2, dropout, min_lr, factor, patience, 
 
 def manipularCsv():
     pd.set_option('display.max_columns', 17)
-    df = pd.read_csv('models/AffectnetGray.csv')
+    df = pd.read_csv('models/RAF-DB.csv')
 
     idx = df['accuracy'].idxmax()
     dfBestAccuracy = df.loc[idx]

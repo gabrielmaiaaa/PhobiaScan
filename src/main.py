@@ -5,15 +5,15 @@ from models.hyperparamentos import hyperparametro
 from src.utils import plotGraficos, saveCsv, saveTxt, manipularCsv, test
 
 l2_regularization = [0.0001]
-dropout = [0.1, 0.2, 0.5, 0.7]
+dropout = [0.2]
 # batch_size = [16, 32, 64]
 #     for taxaDropout in dropout:
 #         for batch in batch_size:
 # l2 = 0.002789250672351807
 # taxaDropout = 0.3
 # dropout = [0.1, 0.2]
-factors = [0.1, 0.2, 0.3]
-min_lrs = [1e-5, 1e-6, 1e-7]
+factors = [0.3]
+min_lrs = [1e-7]
 # l2 = 0.0001
 # taxaDropout = 0.2
 # factor = 0.2
@@ -81,7 +81,9 @@ for l2 in l2_regularization:
 
 # hyperparametro()
 
-test('models/tests/AffectnetGray/AffectnetGray_12/Best_20_loss_1.1719_acc_0.58.keras')
+# test('models/tests/AffectnetGray/AffectnetGray_12/Best_20_loss_1.1719_acc_0.58.keras')
+
+manipularCsv()
 
 # from transformers import AutoImageProcessor, AutoModelForImageClassification
 # from PIL import Image

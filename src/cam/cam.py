@@ -8,8 +8,6 @@ from ultralytics import YOLO
 def get_models():
     emotion_labels = ['disgust', 'fear', 'neutral', 'surprise']
 
-    current_dir = os.path.dirname(__file__)
-
     # Caminhos dos modelos
     model_paths = {
         'yolo': 'models/cam/yolov8n-face.pt',
@@ -21,7 +19,7 @@ def get_models():
         'mini_xception479': 'models/tests/AffectnetGray/AffectnetGray_479/Best_10_loss_1.1092_acc_0.57.keras',
         'mini_xception480': 'models/tests/AffectnetGray/AffectnetGray_480/Best_16_loss_1.1995_acc_0.57.keras',
         'mini_xception481': 'models/tests/AffectnetGray/AffectnetGray_481/Best_16_loss_1.1472_acc_0.56.keras',
-        'mini_xception4': 'models/tests/RAF-DB/RAF-DB_4/Best_119_loss_0.3028_acc_0.92.keras'
+        'mini_xception4': 'models/tests/RAF-DB/RAF-DB_37/Best_106_loss_0.2239_acc_0.94.keras'
     }
 
     # Carregando modelos
@@ -31,14 +29,14 @@ def get_models():
     return model_face, model_mini_xception, emotion_labels
 
 # Função que criar as pastas e salvas as imagens dos rostos reconheicdos, com cor e gray
-def save_dataset(img, img_gray, name, name_gray, img_id):
-    base_dir = os.path.dirname(__file__)
-    data_dir = os.path.join(base_dir, '..', '..', 'data', name)
+def save_dataset(img, img_gray, name, name_gray, img_id, emotion):
+    dirColor = f'data/{name}/Color/{emotion}'
+    dirGray = f'data/{name}/Gray/{emotion}'
     
     # Define os caminhos completos
     paths = {
-        'color': os.path.join(data_dir, 'Color'),
-        'gray': os.path.join(data_dir, 'Gray')
+        'color': dirColor,
+        'gray': dirGray
     }
     
     # Cria os diretórios se não existirem
@@ -82,7 +80,7 @@ def detect(img, name, img_id, models):
             
             # Aplicando o preprocessamento para noso modelo consequir analisar a imagem
             roi_gray = cv2.cvtColor(roi_img, cv2.COLOR_BGR2GRAY)
-            roi_resized = cv2.resize(roi_gray, (48, 48))
+            roi_resized = cv2.resize(roi_gray, (75, 75))
             roi_resized = roi_resized.astype('float32')  # Adicione esta linha
             cv2.imwrite('debug_detect.png', roi_resized)  # Salva o ROI processado
             roi_normalized = roi_resized / 255.0
@@ -106,7 +104,7 @@ def detect(img, name, img_id, models):
                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, color['blue'], 2)
             
             # Salvando imagens para uma analise humana
-            save_dataset(roi_img, roi_gray, name, name+'_Gray', img_id)
+            save_dataset(roi_img, roi_gray, name, name+'_Gray', img_id, emotion)
 
     return img
 
