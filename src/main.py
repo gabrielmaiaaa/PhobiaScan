@@ -5,7 +5,7 @@ from models.hyperparamentos import hyperparametro
 from src.utils import plotGraficos, saveCsv, saveTxt, manipularCsv, test
 
 l2_regularization = [0.0001]
-dropout = [0.2]
+dropout = [0.7]
 # batch_size = [16, 32, 64]
 #     for taxaDropout in dropout:
 #         for batch in batch_size:
@@ -13,7 +13,7 @@ dropout = [0.2]
 # taxaDropout = 0.3
 # dropout = [0.1, 0.2]
 factors = [0.3]
-min_lrs = [1e-7]
+min_lrs = [1e-6]
 # l2 = 0.0001
 # taxaDropout = 0.2
 # factor = 0.2
@@ -27,6 +27,7 @@ for l2 in l2_regularization:
                 fim = time.perf_counter()
 
                 dir = 'models/tests/' + name
+                os.makedirs(dir,exist_ok=True)
 
                 tamanho = 0
 
