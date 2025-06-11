@@ -7,6 +7,7 @@ from ultralytics import YOLO
 # Função que carrega os modelos que treinamos e o Yolo
 def get_models():
     emotion_labels = ['disgust', 'fear', 'neutral', 'surprise']
+    # emotion_labels = ['angry', 'disgust', 'fear', 'happy', 'neutral', 'sad','surprise']
 
     # Caminhos dos modelos
     model_paths = {
@@ -19,12 +20,13 @@ def get_models():
         'mini_xception479': 'models/tests/AffectnetGray/AffectnetGray_479/Best_10_loss_1.1092_acc_0.57.keras',
         'mini_xception480': 'models/tests/AffectnetGray/AffectnetGray_480/Best_16_loss_1.1995_acc_0.57.keras',
         'mini_xception481': 'models/tests/AffectnetGray/AffectnetGray_481/Best_16_loss_1.1472_acc_0.56.keras',
-        'mini_xception4': 'models/tests/RAF-DB/RAF-DB_37/Best_106_loss_0.2239_acc_0.94.keras'
+        'mini_xception37': 'models/tests/RAF-DB/RAF-DB_38/Best_255_loss_0.1820_acc_0.96.keras',
+        'mini_xception0': 'models/tests/RAF-DB2/RAF-DB2_0/Best_123_loss_0.4437_acc_0.87.keras'
     }
 
     # Carregando modelos
     model_face = YOLO(model_paths['yolo'])
-    model_mini_xception = load_model(model_paths['mini_xception4'])
+    model_mini_xception = load_model(model_paths['mini_xception0'])
 
     return model_face, model_mini_xception, emotion_labels
 
