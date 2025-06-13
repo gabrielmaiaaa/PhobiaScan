@@ -18,5 +18,20 @@ Valor da L2 Regularization: 0.0001
 -----Dropout----
 Valor do Dropout: 0.1 
 
+----Min_Lr----
+Valor do Min_Lr: 1e-06
+
+-----Factor-----
+Valor do Factor: 0.2
+
+-----Patience-----
+Valor do Patience: 50
+
+-----PatienceReduce-----
+Valor do PatienceReduce: 10
+
+-----Batch_Size-----
+Valor do Batch_Size: 32
+
 -----Time----
 Time gasto: 18935.494121904998 
