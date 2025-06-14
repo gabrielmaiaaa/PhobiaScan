@@ -21,12 +21,12 @@ print(tf.config.list_physical_devices('GPU'))
 
 batch_size = 32
 num_epochs = 10000
-input_shape = (48, 48, 1)
+input_shape = (75, 75, 1)
 verbose = 1
-patience = 10
+patience = 50
 # min_lr = 1e-6
 # factor = 0.2
-patienceReduce = int(patience/2)
+patienceReduce = int(patience/5)
 # patienceReduce = int(patience/4)
 
 # name = 'AffectnetGray'
@@ -35,7 +35,7 @@ patienceReduce = int(patience/2)
 # name = 'Fer2013AffectnetGrayReduced'
 # train_dir = 'data/' + name
 # name = 'Fer2013'
-name = 'RAF-DB'
+name = 'RAF-DB2'
 train_dir = 'data/' + name + '/train'
 val_dir = 'data/' + name + '/val'
 
@@ -63,7 +63,7 @@ def trainAffectnet():
     # Disctribuição de 80/20 para trinamento e validação
     train_generator = data_generator_train.flow_from_directory(
         directory=train_dir,
-        target_size=(48, 48),
+        target_size=(75, 75),
         batch_size=batch_size,
         color_mode="grayscale",
         class_mode="categorical",
@@ -73,7 +73,7 @@ def trainAffectnet():
 
     validation_generator = data_generator_test.flow_from_directory(
         directory=train_dir,
-        target_size=(48, 48),
+        target_size=(75, 75),
         batch_size=batch_size,
         color_mode="grayscale",
         class_mode="categorical",

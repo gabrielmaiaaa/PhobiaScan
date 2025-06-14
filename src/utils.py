@@ -202,7 +202,7 @@ def saveTxt(newDir, best, last, l2, dropout, time):
         f.write(f'Time gasto: {time} \n')
 
 def saveCsv(name, best, last, diretorio, l2, dropout, min_lr, factor, patience, patienceReduce, batch_size, time):
-    df = pd.read_csv('models/'+name+'.csv')
+    df = pd.read_csv('models/csv/'+name+'.csv')
 
     newDataBest = {'name': name, 
                    'type': 'best', 
@@ -245,11 +245,11 @@ def saveCsv(name, best, last, diretorio, l2, dropout, min_lr, factor, patience, 
 
     df = pd.concat([df, df_new_best, df_new_last], ignore_index=True)
 
-    df.to_csv('models/'+name+'.csv', index=False)
+    df.to_csv('models/csv/'+name+'.csv', index=False)
 
 def manipularCsv():
     pd.set_option('display.max_columns', 17)
-    df = pd.read_csv('models/RAF-DB.csv')
+    df = pd.read_csv('models/csv/RAF-DB.csv')
 
     idx = df['accuracy'].idxmax()
     dfBestAccuracy = df.loc[idx]
