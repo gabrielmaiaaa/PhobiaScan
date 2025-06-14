@@ -6,6 +6,7 @@ from keras.models import load_model
 from ultralytics import YOLO
 import collections
 import pyautogui
+import time
 
 def get_models():
     emotion_labels = ['disgust', 'fear', 'neutral', 'surprise']
@@ -93,31 +94,27 @@ def detect(img, name, models):
 
     return img, emotion
 
-def myScreenshot(numberFeedback, isExec, fps, frameBuffer, screenSize, emotion, dir):
+def myScreenshot(numberFeedback, verificacao, fps, frameBuffer, screenSize, emotion, dir):
     tela = pyautogui.screenshot()
     frame = cv2.cvtColor(np.array(tela), cv2.COLOR_RGB2BGR)
 
     frameBuffer.append(frame)
 
-    if not isExec[0]:
-        isExec[0] = True
-        if emotion == 'fear':
-            numberFeedback[0] += 1
+    if emotion == 'fear':        
+        verificacao[0] += 1
+
+    if verificacao[0] > 10:
+        numberFeedback[0] += 1
+
+        fourcc = cv2.VideoWriter_fourcc(*"XVID")
+        video = cv2.VideoWriter(f'{dir}/feedback{numberFeedback[0]}.avi', fourcc, fps, screenSize)
+
+        for frameVideo in frameBuffer:
+            video.write(frameVideo)
             
-            fourcc = cv2.VideoWriter_fourcc(*"XVID")
-            video = cv2.VideoWriter(f'{dir}/feedback{numberFeedback[0]}.avi', fourcc, fps, screenSize)
-
-            for frameVideo in frameBuffer:
-                video.write(frameVideo)
-            
-            video.release()
-            frameBuffer.clear()
-
-    if emotion != 'fear':
-        isExec[0] = False
-    
-
-import time
+        video.release()
+        frameBuffer.clear()
+        verificacao[0] = 0
 
 def main():
     models = get_models()
@@ -129,9 +126,9 @@ def main():
     arquivos = [f for f in os.listdir(dir) if os.path.isfile(os.path.join(dir, f))]
 
     numberFeedback = [len(arquivos)]
-    isExec = [False]
+    verificacao = [0]
     fps = 5
-    duracao = 180
+    duracao = 30
     bufferSize = fps * duracao
     frameBuffer = collections.deque(maxlen=bufferSize)
 
@@ -146,7 +143,7 @@ def main():
         img, emotion = detect(img, name, models)
         cv2.imshow("Detector de Emocao", img)
 
-        myScreenshot(numberFeedback, isExec, fps, frameBuffer, screenSize, emotion, dir)
+        myScreenshot(numberFeedback, verificacao, fps, frameBuffer, screenSize, emotion, dir)
 
         endTime = time.time()
         dt = endTime - inicialTime
