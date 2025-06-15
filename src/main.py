@@ -1,23 +1,17 @@
 import os
 import time
 from models.train_model import trainModel
-from models.hyperparamentos import hyperparametro
 from src.utils import plotGraficos, saveCsv, saveTxt, manipularCsv, test
+
+# docker build -t tf-gpu-custom .
+# docker run --gpus all -it -v "C:\Users\gmara\Documents\Sourcetree\PhobiaScan:/tf/PhobiaScan" -w /tf/PhobiaScan tf-gpu-custom python -m src.main
+
+# docker run --gpus all -it -v "C:\Users\gmara\.nv:/root/.nv" -v "C:\Users\gmara\Documents\Sourcetree\PhobiaScan:/tf/PhobiaScan" -w /tf/PhobiaScan tf-gpu-custom python -m src.fer2013
 
 l2_regularization = [0.0001]
 dropout = [0.1]
-# batch_size = [16, 32, 64]
-#     for taxaDropout in dropout:
-#         for batch in batch_size:
-# l2 = 0.002789250672351807
-# taxaDropout = 0.3
-# dropout = [0.1, 0.2]
 factors = [0.2]
 min_lrs = [1e-6]
-# l2 = 0.0001
-# taxaDropout = 0.2
-# factor = 0.2
-# min_lr = 1e-6
 for l2 in l2_regularization:
     for taxaDropout in dropout:
         for factor in factors:
@@ -37,7 +31,6 @@ for l2 in l2_regularization:
                 newDir = f'{dir}/{name}_{tamanho}'
                 os.makedirs(newDir,exist_ok=True)
 
-                ## Carregando a última acurácia do último modelo
                 last_val_loss = hist.history['val_loss'][-1]
                 last_epoch = hist.history['val_loss'].index(last_val_loss)
                 last_acc = hist.history['accuracy'][last_epoch]
@@ -49,7 +42,6 @@ for l2 in l2_regularization:
 
                 plotGraficos(final_model_filename_last, validation_generator, train_generator, last_val_acc, 'Last', newDir, hist)
 
-                ## Carregando a melhor acurácia do modelo
                 best_val_loss = min(hist.history['val_loss'])
                 best_epoch = hist.history['val_loss'].index(best_val_loss)
                 best_acc = hist.history['accuracy'][best_epoch]
@@ -58,7 +50,6 @@ for l2 in l2_regularization:
 
                 final_model_filename_best = f"{newDir}/Best_{best_epoch+1}_loss_{best_val_loss:.4f}_acc_{best_val_acc:.2f}.keras"
                 model.save(final_model_filename_best)
-
 
                 plotGraficos(final_model_filename_best, validation_generator, train_generator, best_val_acc, 'Best', newDir, hist)
 
@@ -80,32 +71,6 @@ for l2 in l2_regularization:
                 saveTxt(newDir, best, last, l2, taxaDropout, fim-inicio)
                 saveCsv(name,best,last,newDir,l2,taxaDropout,min_lr,factor,patience,patienceReduce,batch_size,fim-inicio)
 
-# hyperparametro()
-
 # test('models/tests/AffectnetGray/AffectnetGray_12/Best_20_loss_1.1719_acc_0.58.keras')
 
 manipularCsv()
-
-# from transformers import AutoImageProcessor, AutoModelForImageClassification
-# from PIL import Image
-# import torch
-
-# # Carregue o processador e o modelo
-# processor = AutoImageProcessor.from_pretrained("mo-thecreator/vit-Facial-Expression-Recognition")
-# model = AutoModelForImageClassification.from_pretrained("mo-thecreator/vit-Facial-Expression-Recognition")
-
-# # Abra a imagem que deseja testar
-# image = Image.open("data/gab/Color/gab.15.jpg")
-
-# # Pré-processamento da imagem
-# inputs = processor(images=image, return_tensors="pt")
-
-# # Inferência
-# with torch.no_grad():
-#     outputs = model(**inputs)
-#     logits = outputs.logits
-#     predicted_class_idx = logits.argmax(-1).item()
-
-# # Pegue o nome da classe
-# labels = model.config.id2label
-# print("Predição:", labels[predicted_class_idx])

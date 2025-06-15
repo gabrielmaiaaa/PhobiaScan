@@ -48,9 +48,6 @@ python -m src.cam.yolo_cam
 ---
 
 ## 🚧 Em breve
-- Comparação com outros modelos (DeepFace, MediaPipe...)
-- Dataset ajustado para emoções específicas
 - Interface de visualização amigável
-- Melhorias na detecção em tempo real
 
 ---

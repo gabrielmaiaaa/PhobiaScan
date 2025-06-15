@@ -1,0 +1,2 @@
+name,type,diretorio,accuracy,loss,val_accuracy,val_loss,l2,dropout,min_lr,factor,patience,patienceReduce,batch_size,epoch,time
+RAF-DB2,last,models/tests/RAF-DB2/RAF-DB2_0,0.85123211145401,0.48554444313049316,0.8699783086776733,0.44816145300865173,0.0001,0.1,1e-06,0.2,50,10,32,173,18935.494121904998

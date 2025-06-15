@@ -1,0 +1,2 @@
+name,type,diretorio,accuracy,loss,val_accuracy,val_loss,l2,dropout,min_lr,factor,patience,patienceReduce,batch_size,epoch,time
+AffectnetReduced,last,models/tests/AffectnetReduced/AffectnetReduced_0,0.665883481502533,0.7509133219718933,0.6217105388641357,1.1836256980895996,0.0001,0.1,1e-06,0.2,10,5,32,35,543.9463550999644
