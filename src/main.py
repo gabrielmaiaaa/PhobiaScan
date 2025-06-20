@@ -9,9 +9,9 @@ from src.utils import plotGraficos, saveCsv, saveTxt, manipularCsv, test
 # docker run --gpus all -it -v "C:\Users\gmara\.nv:/root/.nv" -v "C:\Users\gmara\Documents\Sourcetree\PhobiaScan:/tf/PhobiaScan" -w /tf/PhobiaScan tf-gpu-custom python -m src.fer2013
 
 l2_regularization = [0.0001]
-dropout = [0.1]
-factors = [0.2]
+dropout = [0.3,0.4,0.6]
 min_lrs = [1e-6]
+factors = [0.1,0.2,0.3]
 for l2 in l2_regularization:
     for taxaDropout in dropout:
         for factor in factors:

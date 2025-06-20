@@ -23,10 +23,10 @@ batch_size = 32
 num_epochs = 10000
 input_shape = (75, 75, 1)
 verbose = 1
-patience = 50
+patience = 10
 # min_lr = 1e-6
 # factor = 0.2
-patienceReduce = int(patience/5)
+patienceReduce = int(patience/2)
 # patienceReduce = int(patience/4)
 
 # name = 'AffectnetGray'
@@ -35,7 +35,7 @@ patienceReduce = int(patience/5)
 # name = 'Fer2013AffectnetGrayReduced'
 # train_dir = 'data/' + name
 # name = 'Fer2013'
-name = 'RAF-DB2'
+name = 'RAF-DB'
 train_dir = 'data/' + name + '/train'
 val_dir = 'data/' + name + '/val'
 

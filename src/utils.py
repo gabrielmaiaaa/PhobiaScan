@@ -252,17 +252,32 @@ def saveCsv(name, best, last, diretorio, l2, dropout, min_lr, factor, patience, 
 
 def manipularCsv():
     pd.set_option('display.max_columns', 17)
-    df = pd.read_csv('models/csv/Best/RAF-DB.csv')
+    df1 = pd.read_csv('models/csv/Best/AffectnetGrayBest.csv')
+    df2 = pd.read_csv('models/csv/Best/AffectnetReducedBest.csv')
+    df3 = pd.read_csv('models/csv/Best/Fer2013AffectnetGrayBest.csv')
+    df4 = pd.read_csv('models/csv/Best/RAF-DB2Best.csv')
+    df5 = pd.read_csv('models/csv/Best/RAF-DBBest.csv')
 
-    tempoGasto = df['time'].sum()
+    tempoGasto = df1['time'].sum()
+    tempoGasto += df2['time'].sum()
+    tempoGasto += df3['time'].sum()
+    tempoGasto += df4['time'].sum()
+    tempoGasto += df5['time'].sum()
 
-    top5A = df.nlargest(10, 'accuracy')
-    top5V = df.nlargest(10, 'val_accuracy')
-    top5L = df.nsmallest(10, 'val_loss')
+    top5A = df1.nlargest(10, 'accuracy')
+    top5V = df1.nlargest(10, 'val_accuracy')
+    top5L = df1.nsmallest(10, 'val_loss')
 
-    print(top5A)
-    print('---'*20)
-    print(top5V)
-    print('---'*20)
-    print(top5L)
-    print(tempoGasto)
+    # print(top5A)
+    # print('---'*20)
+    # print(top5V)
+    # print('---'*20)
+    # print(top5L)
+
+    print(f"Segundos gastos: {tempoGasto}")
+
+    tempoGasto = (tempoGasto/60)/60
+    print(f"Horas gastas: {tempoGasto}")
+
+    tempoGasto = tempoGasto/24
+    print(f"Dias gastos: {tempoGasto}")
