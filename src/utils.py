@@ -1,25 +1,19 @@
 import os
 import shutil
 # from tqdm import tqdm 
-
 import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
-
 from keras.models import load_model
-
 from sklearn.metrics import classification_report, confusion_matrix
-
-from skimage.io import imread
+from skimage.io import imread, imsave  # Adicionei imsave aqui
 from skimage.color import rgb2gray
 from skimage.transform import resize
-
 
 # def populandoDataset():
 #     fer2013 = 'data/Fer2013'
 #     affect = 'data/Affectnet'
-
 #     newFer = os.path.join('data/Fer2013New')
 
 #     os.makedirs(newFer, exist_ok=True)
@@ -31,7 +25,7 @@ from skimage.transform import resize
 #         'surprise': 'surprise'
 #     }
 
-#     os.makedirs(newFer, exist_ok=True)
+#     # Cria os diretórios de destino
 #     for emocao in mapeamento_emocoes.values():
 #         os.makedirs(os.path.join(newFer, emocao), exist_ok=True)
 
@@ -47,19 +41,22 @@ from skimage.transform import resize
 #                     img_path = os.path.join(diretorio, arquivo)
 #                     image = imread(img_path)
 
-#                     if image.ndim == 3:
+#                     # Verifica se a imagem tem 3 canais (RGB)
+#                     if image.ndim == 3 and image.shape[2] == 3:
 #                         image = rgb2gray(image)
-#                     image = resize(image, (48, 48))
-
+                    
+#                     # Redimensiona e converte para 8-bit
+#                     # image = resize(image, (48, 48))  # Descomente se precisar redimensionar
 #                     image = (image * 255).astype(np.uint8)
 
-#                     new_filename = f"affect_{diretorio}"
+#                     # Usa o nome original do arquivo (ou pode adicionar um prefixo)
+#                     new_filename = arquivo
 #                     save_path = os.path.join(destino_dir, new_filename)
                     
 #                     imsave(save_path, image)
 
 #                 except Exception as e:
-#                     print(f'Erro ao processar: {arquivo}, {e}')
+#                     print(f'Erro ao processar: {arquivo}, {e}, {diretorio}')
 #                     continue
 
 def test(final_model_filename):
@@ -266,13 +263,13 @@ def manipularCsv():
 
     top5A = df1.nlargest(10, 'accuracy')
     top5V = df1.nlargest(10, 'val_accuracy')
-    top5L = df1.nsmallest(10, 'val_loss')
+    top5L = df3.nsmallest(10, 'val_loss')
 
     # print(top5A)
     # print('---'*20)
     # print(top5V)
-    # print('---'*20)
-    # print(top5L)
+    print('---'*20)
+    print(top5L)
 
     print(f"Segundos gastos: {tempoGasto}")
 

@@ -18,10 +18,19 @@ np.random.seed(6743)
 tf.random.set_seed(6743)
 
 print(tf.config.list_physical_devices('GPU'))
+import tensorflow as tf
+gpus = tf.config.experimental.list_physical_devices('GPU')
+if gpus:
+    try:
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
+    except RuntimeError as e:
+        print(e)
+
 
 batch_size = 32
 num_epochs = 10000
-input_shape = (75, 75, 1)
+input_shape = (48, 48, 1)
 verbose = 1
 patience = 10
 # min_lr = 1e-6
@@ -34,10 +43,10 @@ patienceReduce = int(patience/2)
 # name = 'Fer2013AffectnetGray'
 # name = 'Fer2013AffectnetGrayReduced'
 # train_dir = 'data/' + name
-# name = 'Fer2013'
-name = 'RAF-DB'
+name = 'Fer2013'
+# name = 'RAF-DB'
 train_dir = 'data/' + name + '/train'
-val_dir = 'data/' + name + '/val'
+val_dir = 'data/' + name + '/test'
 
 def trainAffectnet():
     # Aumento de Dataset
@@ -46,11 +55,8 @@ def trainAffectnet():
         height_shift_range=0.2,
         rotation_range=10,
         horizontal_flip=True,
-        featurewise_center=False,
-        featurewise_std_normalization=False,
         brightness_range=[0.3, 1.2],
         zoom_range=0.2,
-        fill_mode='nearest',
         rescale=1./255,
         validation_split = 0.2
     )
@@ -63,7 +69,7 @@ def trainAffectnet():
     # Disctribuição de 80/20 para trinamento e validação
     train_generator = data_generator_train.flow_from_directory(
         directory=train_dir,
-        target_size=(75, 75),
+        target_size=(48, 48),
         batch_size=batch_size,
         color_mode="grayscale",
         class_mode="categorical",
@@ -73,7 +79,7 @@ def trainAffectnet():
 
     validation_generator = data_generator_test.flow_from_directory(
         directory=train_dir,
-        target_size=(75, 75),
+        target_size=(48, 48),
         batch_size=batch_size,
         color_mode="grayscale",
         class_mode="categorical",
@@ -90,11 +96,8 @@ def trainFer2013():
         height_shift_range=0.2,
         rotation_range=10,
         horizontal_flip=True,
-        featurewise_center=False,
-        featurewise_std_normalization=False,
         brightness_range=[0.3, 1.2],
         zoom_range=0.2,
-        fill_mode='nearest',
         rescale=1./255
     )
 
@@ -105,7 +108,7 @@ def trainFer2013():
     # Disctribuição de 80/20 para trinamento e validação
     train_generator = data_generator_train.flow_from_directory(
         directory=train_dir,
-        target_size=(75, 75),
+        target_size=(48, 48),
         batch_size=batch_size,
         color_mode="grayscale",
         class_mode="categorical",
@@ -114,7 +117,7 @@ def trainFer2013():
 
     validation_generator = data_generator_test.flow_from_directory(
         directory=val_dir,
-        target_size=(75, 75),
+        target_size=(48, 48),
         batch_size=batch_size,
         color_mode="grayscale",
         class_mode="categorical",
