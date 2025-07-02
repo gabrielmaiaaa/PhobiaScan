@@ -9,6 +9,7 @@ import collections
 from ultralytics import YOLO
 from turtle import screensize
 from keras.models import load_model
+import pydirectinput
 
 def get_models():
     emotion_labels = ['disgust', 'fear', 'neutral', 'surprise']
@@ -64,11 +65,6 @@ def detect(img, name, models):
 
         for box in boxes:
             x1, y1, x2, y2 = map(int, box[:4])
-            # x1 -= 50
-            # y1 -= 50
-            # x2 += 50
-            # y2 += 50
-            print(x1,y1,x2,y2)
 
             cv2.rectangle(img, (x1, y1), (x2, y2), color['blue'], 2)
             
@@ -105,7 +101,7 @@ def myScreenshot(numberFeedback, verificacao, fps, frameBuffer, screenSize, emot
     if emotion == 'fear':        
         verificacao[0] += 1
 
-    if verificacao[0] > 10:
+    if verificacao[0] > 5:
         numberFeedback[0] += 1
 
         fourcc = cv2.VideoWriter_fourcc(*"XVID")
@@ -121,7 +117,7 @@ def myScreenshot(numberFeedback, verificacao, fps, frameBuffer, screenSize, emot
 def main():
     models = get_models()
 
-    name = 'Gabriel3'
+    name = input("Qual o seu nome? ")
     
     dir = f'Feedbacks/{name}'
     os.makedirs(dir, exist_ok=True)
@@ -151,6 +147,14 @@ def main():
         hwnd = win32gui.FindWindow(None, window_name)
         win32gui.SetWindowPos(hwnd, win32con.HWND_TOPMOST, 0, 0, 0, 0,
                         win32con.SWP_NOMOVE | win32con.SWP_NOSIZE)
+        
+        # REPO
+        # if emotion == 'disgust':
+        #     pydirectinput.press('7')
+        # if emotion == 'fear':
+        #     pydirectinput.press('9')
+        # if emotion == 'surprise':
+        #     pydirectinput.press('7')
 
         myScreenshot(numberFeedback, verificacao, fps, frameBuffer, screenSize, emotion, dir)
 

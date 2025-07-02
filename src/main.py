@@ -14,10 +14,10 @@ if __name__ == '__main__':
         print("Usage: py -m main l2 dropout min_lr factor")
         sys.exit(1)
 
-    l2 = sys.argv[1]
-    taxaDropout = sys.argv[2]
-    min_lr = sys.argv[3]
-    factor = sys.argv[4]
+    l2 = float(sys.argv[1])
+    taxaDropout = float(sys.argv[2])
+    min_lr = float(sys.argv[3])
+    factor = float(sys.argv[4])
     print(l2, taxaDropout, factor, min_lr)
 
     inicio = time.perf_counter()
