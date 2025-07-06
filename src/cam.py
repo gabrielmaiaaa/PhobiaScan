@@ -1,6 +1,7 @@
 import os
 import cv2
 import time
+from cycler import V
 import win32gui
 import win32con
 import pyautogui
@@ -10,10 +11,13 @@ from ultralytics import YOLO
 from turtle import screensize
 from keras.models import load_model
 import pydirectinput
+import threading
+
+cv2.setUseOptimized(True) 
 
 def get_models():
-    emotion_labels = ['disgust', 'fear', 'neutral', 'surprise']
-    # emotion_labels = ['angry', 'disgust', 'fear', 'happy', 'neutral', 'sad','surprise']
+    # emotion_labels = ['disgust', 'fear', 'neutral', 'surprise']
+    emotion_labels = ['angry', 'disgust', 'fear', 'happy', 'neutral', 'sad','surprise']
 
     model_paths = {
         'yolo': 'models/cam/yolov8n-face.pt',
@@ -22,7 +26,7 @@ def get_models():
     }
 
     model_face = YOLO(model_paths['yolo'])
-    model_mini_xception = load_model(model_paths['mini_xceptionEmotion4'])
+    model_mini_xception = load_model(model_paths['mini_xceptionEmotion7'])
 
     return model_face, model_mini_xception, emotion_labels
 
@@ -92,25 +96,32 @@ def detect(img, name, models):
 
     return img, emotion
 
+def write_video(frames, video_path, fps, screen_size):
+    fourcc = cv2.VideoWriter_fourcc(*"XVID")
+    video = cv2.VideoWriter(video_path, fourcc, fps, screen_size)
+    for frame in frames:
+        video.write(frame)
+    video.release()
+
 def myScreenshot(numberFeedback, verificacao, fps, frameBuffer, screenSize, emotion, dir):
     tela = pyautogui.screenshot()
     frame = cv2.cvtColor(np.array(tela), cv2.COLOR_RGB2BGR)
 
     frameBuffer.append(frame)
 
-    if emotion == 'fear':        
+    if emotion == 'disgust':        
         verificacao[0] += 1
 
     if verificacao[0] > 5:
         numberFeedback[0] += 1
-
-        fourcc = cv2.VideoWriter_fourcc(*"XVID")
-        video = cv2.VideoWriter(f'{dir}/feedback{numberFeedback[0]}.avi', fourcc, fps, screenSize)
-
-        for frameVideo in frameBuffer:
-            video.write(frameVideo)
-            
-        video.release()
+        frames_to_save = list(frameBuffer)  
+        video_path = f'{dir}/feedback{numberFeedback[0]}.avi'
+        
+        threading.Thread(
+            target=write_video,
+            args=(frames_to_save, video_path, fps, screenSize)
+        ).start()
+        
         frameBuffer.clear()
         verificacao[0] = 0
 
@@ -126,7 +137,7 @@ def main():
     numberFeedback = [len(arquivos)]
     verificacao = [0]
     fps = 5
-    duracao = 30
+    duracao = 10
     bufferSize = fps * duracao
     frameBuffer = collections.deque(maxlen=bufferSize)
 
