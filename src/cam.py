@@ -31,8 +31,8 @@ def get_models():
     return model_face, model_mini_xception, emotion_labels
 
 def save_dataset(img, img_gray, name, name_gray, emotion):
-    dirColor = f'data/{name}/Color/{emotion}'
-    dirGray = f'data/{name}/Gray/{emotion}'
+    dirColor = f'data/Test/{name}/Color/{emotion}'
+    dirGray = f'data/Test/{name}/Gray/{emotion}'
 
     os.makedirs(dirColor, exist_ok=True)
     arquivos = [f for f in os.listdir(dirColor) if os.path.isfile(os.path.join(dirColor, f))]
