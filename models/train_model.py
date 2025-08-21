@@ -13,9 +13,11 @@ import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 
-random.seed(6743)
-np.random.seed(6743)
-tf.random.set_seed(6743)
+seed = 6743
+
+random.seed(seed)
+np.random.seed(seed)
+tf.random.set_seed(seed)
 
 print(tf.config.list_physical_devices('GPU'))
 import tensorflow as tf
@@ -42,9 +44,9 @@ patienceReduce = int(patience/2)
 # name = 'AffectnetReduced'
 # name = 'Fer2013AffectnetGray'
 # name = 'Fer2013AffectnetGrayReduced'
-name = 'Fer2013Balanced'
+# name = 'Fer2013Balanced'
 # train_dir = 'data/' + name
-# name = 'Fer2013'
+name = 'Fer2013'
 # name = 'RAF-DB'
 train_dir = 'data/' + name + '/train'
 val_dir = 'data/' + name + '/test'
@@ -75,7 +77,8 @@ def trainAffectnet():
         color_mode="grayscale",
         class_mode="categorical",
         subset='training',
-        shuffle=True
+        shuffle=True,
+        seed = seed
     )
 
     validation_generator = data_generator_test.flow_from_directory(
@@ -85,7 +88,8 @@ def trainAffectnet():
         color_mode="grayscale",
         class_mode="categorical",
         subset="validation",
-        shuffle=False
+        shuffle=False,
+        seed = seed
     )
 
     return train_generator, validation_generator
@@ -113,7 +117,8 @@ def trainFer2013():
         batch_size=batch_size,
         color_mode="grayscale",
         class_mode="categorical",
-        shuffle=True
+        shuffle=True,
+        seed = seed
     )
 
     validation_generator = data_generator_test.flow_from_directory(
@@ -122,7 +127,8 @@ def trainFer2013():
         batch_size=batch_size,
         color_mode="grayscale",
         class_mode="categorical",
-        shuffle=False
+        shuffle=False,
+        seed = seed
     )
 
     return train_generator, validation_generator
@@ -200,4 +206,4 @@ def trainModel(l2, taxaDropout, factor, min_lr):
     )
 
     # return hist, model, validation_generator, train_generator, name, min_lr, patience, batch_size, factor
-    return hist, model, validation_generator, train_generator, name, patience, batch_size, patienceReduce
+    return hist, model, validation_generator, train_generator, name, patience, batch_size, patienceReduce, seed

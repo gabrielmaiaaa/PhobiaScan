@@ -177,7 +177,7 @@ def plotGraficos(final_model_filename, validation_generator, train_generator, va
     plt.legend(['Train', 'Val'], loc='lower right')
     plt.savefig(f'{dir}/model_accuracy_{type}.png')
 
-def saveTxt(newDir, best, last, l2, dropout, time):
+def saveTxt(newDir, best, last, l2, dropout, time, seed):
     with open(f'{newDir}/data.txt', 'w') as f:
         f.write(f'----Best----\n')
         f.write(f"Valor da accuracy: {best['acc']} \n")
@@ -195,10 +195,12 @@ def saveTxt(newDir, best, last, l2, dropout, time):
         f.write(f'Valor da L2 Regularization: {l2} \n')
         f.write(f'\n-----Dropout----\n')
         f.write(f'Valor do Dropout: {dropout} \n')
+        f.write(f'\n-----Seed----\n')
+        f.write(f'Valor do Seed: {seed} \n')
         f.write(f'\n-----Time----\n')
         f.write(f'Time gasto: {time} \n')
 
-def saveCsv(name, best, last, diretorio, l2, dropout, min_lr, factor, patience, patienceReduce, batch_size, time):
+def saveCsv(name, best, last, diretorio, l2, dropout, min_lr, factor, patience, patienceReduce, batch_size, time, seed):
     dfBest = pd.read_csv(f'models/csv/Best/{name}Best.csv')
     dfLast = pd.read_csv(f'models/csv/Last/{name}Last.csv')
 
@@ -217,6 +219,7 @@ def saveCsv(name, best, last, diretorio, l2, dropout, min_lr, factor, patience, 
                    'patienceReduce': patienceReduce, 
                    'batch_size': batch_size, 
                    'epoch': best['epoch'], 
+                   'seed': seed,
                    'time': time
                    }
     
@@ -235,6 +238,7 @@ def saveCsv(name, best, last, diretorio, l2, dropout, min_lr, factor, patience, 
                    'patienceReduce': patienceReduce, 
                    'batch_size': batch_size, 
                    'epoch': last['epoch'], 
+                   'seed': seed,
                    'time': time
                    }
     
