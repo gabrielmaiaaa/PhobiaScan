@@ -1,0 +1,1 @@
+name,type,diretorio,accuracy,loss,val_accuracy,val_loss,l2,dropout,min_lr,factor,patience,patienceReduce,batch_size,epoch,time

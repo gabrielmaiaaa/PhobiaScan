@@ -1,0 +1,25 @@
+----Best----
+Valor da accuracy: 0.418887734413147 
+Valor da loss: 1.3187637329101562 
+Valor da val_acc: 0.4759630560874939 
+Valor da val_loss: 1.287935733795166 
+Época: 8 
+
+-----Last----
+Valor da accuracy: 0.578964114189148 
+Valor da loss: 0.9795070886611938 
+Valor da val_acc: 0.4632282853126526 
+Valor da val_loss: 1.528996229171753 
+Época: 18 
+
+-----L2----
+Valor da L2 Regularization: 0.005 
+
+-----Dropout----
+Valor do Dropout: 0.7 
+
+-----Seed----
+Valor do Seed: 6743 
+
+-----Time----
+Time gasto: 360.6970405000029 

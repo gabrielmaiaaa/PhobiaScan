@@ -29,10 +29,10 @@ if gpus:
     except RuntimeError as e:
         print(e)
 
-
+sizes = 75
 batch_size = 32
 num_epochs = 10000
-input_shape = (48, 48, 1)
+input_shape = (sizes, sizes, 1)
 verbose = 1
 patience = 10
 # min_lr = 1e-6
@@ -41,15 +41,16 @@ patienceReduce = int(patience/2)
 # patienceReduce = int(patience/4)
 
 # name = 'AffectnetGray'
+name = 'AffectnetBalanced'
 # name = 'AffectnetReduced'
 # name = 'Fer2013AffectnetGray'
 # name = 'Fer2013AffectnetGrayReduced'
 # name = 'Fer2013Balanced'
 # train_dir = 'data/' + name
-name = 'Fer2013'
+# name = 'Fer2013'
 # name = 'RAF-DB'
 train_dir = 'data/' + name + '/train'
-val_dir = 'data/' + name + '/test'
+val_dir = 'data/' + name + '/val'
 
 def trainAffectnet():
     # Aumento de Dataset
@@ -72,7 +73,7 @@ def trainAffectnet():
     # Disctribuição de 80/20 para trinamento e validação
     train_generator = data_generator_train.flow_from_directory(
         directory=train_dir,
-        target_size=(48, 48),
+        target_size=(sizes, sizes),
         batch_size=batch_size,
         color_mode="grayscale",
         class_mode="categorical",
@@ -83,7 +84,7 @@ def trainAffectnet():
 
     validation_generator = data_generator_test.flow_from_directory(
         directory=train_dir,
-        target_size=(48, 48),
+        target_size=(sizes, sizes),
         batch_size=batch_size,
         color_mode="grayscale",
         class_mode="categorical",
@@ -113,7 +114,7 @@ def trainFer2013():
     # Disctribuição de 80/20 para trinamento e validação
     train_generator = data_generator_train.flow_from_directory(
         directory=train_dir,
-        target_size=(48, 48),
+        target_size=(sizes, sizes),
         batch_size=batch_size,
         color_mode="grayscale",
         class_mode="categorical",
@@ -123,7 +124,7 @@ def trainFer2013():
 
     validation_generator = data_generator_test.flow_from_directory(
         directory=val_dir,
-        target_size=(48, 48),
+        target_size=(sizes, sizes),
         batch_size=batch_size,
         color_mode="grayscale",
         class_mode="categorical",
@@ -134,7 +135,7 @@ def trainFer2013():
     return train_generator, validation_generator
 
 def trainModel(l2, taxaDropout, factor, min_lr):
-    if name == 'Fer2013' or name == 'RAF-DB':
+    if name == 'Fer2013' or name == 'RAF-DB' or name == 'AffectnetBalanced':
         train_generator, validation_generator = trainFer2013()
     else:
         train_generator, validation_generator = trainAffectnet()

@@ -44,7 +44,7 @@ if __name__ == '__main__':
     final_model_filename_last = f"{newDir}/Last_{last_epoch+1}_loss_{last_val_loss:.4f}_acc_{last_val_acc:.2f}.keras"
     model.save(final_model_filename_last)
 
-    plotGraficos(final_model_filename_last, validation_generator, train_generator, last_val_acc, 'Last', newDir, hist)
+    # plotGraficos(final_model_filename_last, validation_generator, train_generator, last_val_acc, 'Last', newDir, hist)
 
     best_val_loss = min(hist.history['val_loss'])
     best_epoch = hist.history['val_loss'].index(best_val_loss)
